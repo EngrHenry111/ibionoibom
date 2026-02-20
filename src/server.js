@@ -12,14 +12,14 @@ app.get("/", (req, res) => {
   });
 });
 
-app.get("/test-db", async (req, res) => {
-  try {
-    const collections = await mongoose.connection.db.listCollections().toArray();
-    res.json({ connected: true, collections });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
+// app.get("/test-db", async (req, res) => {
+//   try {
+//     const collections = await mongoose.connection.db.listCollections().toArray();
+//     res.json({ connected: true, collections });
+//   } catch (err) {
+//     res.status(500).json({ error: err.message });
+//   }
+// });
 app.listen(process.env.PORT, () =>
   console.log(`Server running on port ${process.env.PORT}`)
 );
