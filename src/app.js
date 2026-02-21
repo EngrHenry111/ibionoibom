@@ -10,8 +10,6 @@ import mediaRoutes from "./routes/media.routes.js";
 import tenureRoutes from "./routes/tenure.routes.js";
 import dashboardRoutes from "./routes/dashboard.routes.js"
 
-
-
 const app = express();
 
 app.use(cors());
@@ -29,14 +27,14 @@ app.use("/api/news", newsRoutes);
 app.use("/api/media", mediaRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 
-// app.use(
-//   cors({
-//     origin: [
-//       "http://localhost:5173",
-//       "https://your-frontend-domain.vercel.app"
-//     ],
-//     credentials: true
-//   })
-// );
+app.use(
+  cors({
+    origin: [
+      "http://localhost:5173",
+      "https://ibionoibomlga.vercel.app"
+    ],
+    credentials: true
+  })
+);
 
 export default app;
