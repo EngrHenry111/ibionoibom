@@ -28,6 +28,7 @@ app.use("/api/departments", departmentRoutes);
 app.use("/api/news", newsRoutes);
 app.use("/api/media", mediaRoutes);
 app.use("/api/dashboard", dashboardRoutes);
+
 // app.use(
 //   cors({
 //     origin: [
