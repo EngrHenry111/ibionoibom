@@ -20,10 +20,10 @@ export const createLeader = async (req, res) => {
       tenure,
       status: status || "draft",
 
-      imageUrl: req.file
-      ? `${process.env.SERVER_URL}/uploads/leaders/${req.file.filename}`
-      : null,
-      // imageUrl: req.file ? req.file.filename : null,
+      // imageUrl: req.file
+      // ? `${process.env.SERVER_URL}/uploads/leaders/${req.file.filename}`
+      // : null,
+      imageUrl: req.file ? req.file.filename : null,
     });
 
     res.status(201).json(leader);
