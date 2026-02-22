@@ -1,12 +1,17 @@
-import mongoose from "mongoose";
+// import mongoose from "mongoose";
 import News from "../models/News.js";
 
 /* CREATE NEWS */
 export const createNews = async (req, res) => {
   try {
     const { title, content } = req.body;
+    
+    const images =
+      req.files?.map(
+        (f) => `${process.env.SERVER_URL}/uploads/news/${f.filename}`
+      ) || [];
 
-    const images = req.files?.map((f) => f.filename) || [];
+    // const images = req.files?.map((f) => f.filename) || [];
 
     const news = await News.create({
       title,

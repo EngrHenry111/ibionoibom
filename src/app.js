@@ -27,9 +27,7 @@ app.use("/api/news", newsRoutes);
 app.use("/api/media", mediaRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 
-app.get("/", (req, res) => {
-  res.send("Backend is awake");
-});
+
 
 app.use(
   cors({
