@@ -13,17 +13,19 @@ export const createLeader = async (req, res) => {
       });
     }
 
+    let imageUrl = null;
+
+    if (req.file) {
+      imageUrl = `leaders/${req.file.filename}`;
+    }
+
     const leader = await Leader.create({
       fullName,
       position,
       bio,
       tenure,
       status: status || "draft",
-
-      imageUrl: req.file
-      ? `${process.env.SERVER_URL}/uploads/leaders/${req.file.filename}`
-      : null,
-      // imageUrl: req.file ? req.file.filename : null,
+      imageUrl,
     });
 
     res.status(201).json(leader);
@@ -32,6 +34,35 @@ export const createLeader = async (req, res) => {
     res.status(500).json({ message: "Failed to create leader" });
   }
 };
+// export const createLeader = async (req, res) => {
+//   try {
+//     const { fullName, position, bio, tenure, status } = req.body;
+
+//     if (!fullName || !position || !tenure) {
+//       return res.status(400).json({
+//         message: "Full name, position and tenure are required",
+//       });
+//     }
+
+//     const leader = await Leader.create({
+//       fullName,
+//       position,
+//       bio,
+//       tenure,
+//       status: status || "draft",
+
+//       // imageUrl: req.file
+//       // ? `${process.env.SERVER_URL}/uploads/leaders/${req.file.filename}`
+//       // : null,
+//       imageUrl: req.file ? req.file.filename : null,
+//     });
+
+//     res.status(201).json(leader);
+//   } catch (error) {
+//     console.error("CREATE LEADER ERROR:", error);
+//     res.status(500).json({ message: "Failed to create leader" });
+//   }
+// };
 
 /* ===============================
    GET ALL LEADERS (ADMIN)

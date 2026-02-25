@@ -9,23 +9,27 @@ import {
   deleteNews,
   getNewsById,
   updateNewsStatus,
-  getSingleNews,
-  getPublishedNews,
-  getSinglePublishedNews,
+  // getSingleNews,
+  // getPublishedNews,
+  // getSinglePublishedNews,
   getPublicNews,
   getPublicNewsById,
 } from "../controllers/news.controller.js";
 
 const router = express.Router();
 
-router.get("/public", getPublicNews);
-router.get("/public", getPublishedNews);
 
+/* ================= PUBLIC ROUTES ================= */
+
+router.get("/public", getPublicNews);
+router.get("/public/:id", getPublicNewsById);
+
+/* ================= ADMIN ROUTES ================= */
 
 router.get("/", protect, getAllNews);
 
-// CREATE → everyone
-// ✅ CREATE news (multiple images)
+router.get("/:id", protect, getNewsById);
+
 router.post(
   "/",
   protect,
@@ -40,39 +44,63 @@ router.put(
   updateNews
 );
 
-
-router.get("/:id", getSingleNews);
-
-// UPDATE STATUS → admin & super_admin
 router.patch(
-   "/:id/status",
+  "/:id/status",
   protect,
   requireRole("admin", "super_admin"),
   updateNewsStatus
 );
 
-
-// DELETE → super_admin only
 router.delete(
   "/:id",
   protect,
   requireRole("super_admin"),
   deleteNews
 );
+// router.get("/public", getPublicNews);
+// router.get("/public", getPublishedNews);
 
-/* PUBLIC */
-/* ================= PUBLIC ROUTES ================= */
+// router.get("/", protect, getAllNews);
 
-// Public: Only published news
+// // CREATE → everyone
+// // ✅ CREATE news (multiple images)
+// router.post(
+//   "/",
+//   protect,
+//   uploadNewsImages.array("images", 5),
+//   createNews
+// );
 
+// router.put(
+//   "/:id",
+//   protect,
+//   uploadNewsImages.array("images", 5),
+//   updateNews
+// );
 
-// Public: Single published news
-router.get("/public/:id", getSinglePublishedNews);
+// router.get("/:id", getSingleNews);
 
-router.get("/:id", protect, getNewsById);
+// // UPDATE STATUS → admin & super_admin
+// router.patch(
+//    "/:id/status",
+//   protect,
+//   requireRole("admin", "super_admin"),
+//   updateNewsStatus
+// );
 
+// // DELETE → super_admin only
+// router.delete(
+//   "/:id",
+//   protect,
+//   requireRole("super_admin"),
+//   deleteNews
+// );
+
+// /* PUBLIC */
+// /* ================= PUBLIC ROUTES ================= */
+// router.get("/public/:id", getSinglePublishedNews);
+// router.get("/:id", protect, getNewsById);
 // router.get("/public/:id", getPublicNewsById);
-router.get("/public/:id", getPublicNewsById);
 
 export default router;
 
