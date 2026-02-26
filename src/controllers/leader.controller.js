@@ -21,8 +21,6 @@ import mongoose from "mongoose";
 //     res.status(500).json({ message: "Failed to create leader" });
 //   }
 // };
-
-
 export const createLeader = async (req, res) => {
   try {
     const { fullName, position, bio, tenure, status } = req.body;
@@ -33,6 +31,8 @@ export const createLeader = async (req, res) => {
       });
     }
 
+    const imageUrl = req.file ? req.file.path : null;
+
     const leader = await Leader.create({
       fullName,
       position,
@@ -42,14 +42,10 @@ export const createLeader = async (req, res) => {
       imageUrl,
     });
 
-    if (req.file) {
-      leader.imageUrl=req.file.path;
-    }
-
     res.status(201).json(leader);
   } catch (error) {
     console.error("CREATE LEADER ERROR:", error);
-    res.status(500).json({ message: "Failed to create leader" });
+    res.status(500).json({ message: error.message });
   }
 };
 // export const createLeader = async (req, res) => {
