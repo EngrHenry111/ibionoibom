@@ -5,17 +5,14 @@ import News from "../models/News.js";
 export const createNews = async (req, res) => {
   try {
     const { title, content } = req.body;
-    
-    // const images =
-    //   req.files?.map(
-    //     (f) => `${process.env.SERVER_URL}/uploads/news/${f.filename}`
-    //   ) || [];
 
-    if (req.files && req.files.lenght > 0){
-      news.images = req.files.map(file => file.path);
+    if (!title || !content) {
+      return res.status(400).json({ message: "Title and content required" });
     }
 
-    // const images = req.files?.map((f) => f.filename) || [];
+    const images = req.files?.length
+      ? req.files.map((file) => file.path)
+      : [];
 
     const news = await News.create({
       title,
@@ -28,10 +25,9 @@ export const createNews = async (req, res) => {
     return res.status(201).json(news);
   } catch (err) {
     console.error("CREATE NEWS ERROR:", err);
-    return res.status(500).json({ message: "Server error" });
+    return res.status(500).json({ message: err.message });
   }
 };
-
 /* GET ALL (ADMIN) */
 export const getAllNews = async (req, res) => {
   const news = await News.find().sort({ createdAt: -1 });
