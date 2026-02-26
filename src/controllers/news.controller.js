@@ -1,5 +1,7 @@
 // import mongoose from "mongoose";
 import News from "../models/News.js";
+import cloudinary from "../config/cloudinary.js";
+
 
 /* CREATE NEWS */
 export const createNews = async (req, res) => {
@@ -161,18 +163,6 @@ export const getSingleNews = async (req, res) => {
 // };
 
 
-import cloudinary from "../config/cloudinary.js";
-
-export const deleteNews = async (req, res) => {
-  try {
-    const news = await News.findById(req.params.id);
-
-    if (!news) {
-      return res.status(404).json({ message: "News not found" });
-    }
-
-    // Delete images from Cloudinary
-  import cloudinary from "../config/cloudinary.js";
 
 export const deleteNews = async (req, res) => {
   try {
@@ -209,7 +199,6 @@ export const deleteNews = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
-
 // // UPDATE NEWS STATUS
 // export const updateNewsStatus = async (req, res) => {
 //   try {
