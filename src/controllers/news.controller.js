@@ -172,14 +172,32 @@ export const deleteNews = async (req, res) => {
     }
 
     // Delete images from Cloudinary
+  import cloudinary from "../config/cloudinary.js";
+
+export const deleteNews = async (req, res) => {
+  try {
+    const news = await News.findById(req.params.id);
+
+    if (!news) {
+      return res.status(404).json({ message: "News not found" });
+    }
+
     if (news.images && news.images.length > 0) {
       for (let imageUrl of news.images) {
-        // Extract public_id
-        const publicId = imageUrl
-          .split("/upload/")[1]
-          .split(".")[0];
+        try {
+          const parts = imageUrl.split("/upload/");
+          if (parts.length > 1) {
+            const publicIdWithVersion = parts[1];
+            const publicId = publicIdWithVersion
+              .replace(/^v\d+\//, "") // remove version like v123/
+              .split(".")[0];
 
-        await cloudinary.uploader.destroy(publicId);
+            await cloudinary.uploader.destroy(publicId);
+            console.log("Deleted from Cloudinary:", publicId);
+          }
+        } catch (cloudErr) {
+          console.error("Cloudinary delete error:", cloudErr);
+        }
       }
     }
 
