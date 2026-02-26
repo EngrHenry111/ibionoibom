@@ -2,7 +2,27 @@ import Leader from "../models/Leader.js";
 import mongoose from "mongoose";
 /* ===============================
    CREATE LEADER
-================================ */
+// ================================ */
+// export const createLeader = async (req, res) => {
+//   try {
+//     const leader = new Leader({
+//       fullName: req.body.fullName,
+//       position: req.body.position,
+//       bio: req.body.bio,
+//       tenure: req.body.tenure,
+//       status: req.body.status || "draft",
+//       imageUrl: req.file ? req.file.path : "",
+//     });
+
+//     await leader.save();
+//     res.status(201).json(leader);
+//   } catch (error) {
+//     console.error(error);
+//     res.status(500).json({ message: "Failed to create leader" });
+//   }
+// };
+
+
 export const createLeader = async (req, res) => {
   try {
     const { fullName, position, bio, tenure, status } = req.body;
@@ -13,12 +33,6 @@ export const createLeader = async (req, res) => {
       });
     }
 
-    let imageUrl = null;
-
-    if (req.file) {
-      imageUrl = `leaders/${req.file.filename}`;
-    }
-
     const leader = await Leader.create({
       fullName,
       position,
@@ -27,6 +41,10 @@ export const createLeader = async (req, res) => {
       status: status || "draft",
       imageUrl,
     });
+
+    if (req.file) {
+      leader.imageUrl=req.file.path;
+    }
 
     res.status(201).json(leader);
   } catch (error) {

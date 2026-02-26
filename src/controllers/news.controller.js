@@ -6,10 +6,14 @@ export const createNews = async (req, res) => {
   try {
     const { title, content } = req.body;
     
-    const images =
-      req.files?.map(
-        (f) => `${process.env.SERVER_URL}/uploads/news/${f.filename}`
-      ) || [];
+    // const images =
+    //   req.files?.map(
+    //     (f) => `${process.env.SERVER_URL}/uploads/news/${f.filename}`
+    //   ) || [];
+
+    if (req.files && req.files.lenght > 0){
+      news.images = req.files.map(file => file.path);
+    }
 
     // const images = req.files?.map((f) => f.filename) || [];
 
