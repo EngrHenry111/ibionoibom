@@ -42,7 +42,17 @@ export const createLeader = async (req, res) => {
       imageUrl,
     });
 
+await Archive.create({
+title: leader.fullName,
+description: leader.position,
+category: "leader",
+year: leader.tenure?.startYear,
+tags: ["leadership","chairman"],
+referenceId: leader._id
+});
+
     res.status(201).json(leader);
+
   } catch (error) {
     console.error("CREATE LEADER ERROR:", error);
     res.status(500).json({ message: error.message });
