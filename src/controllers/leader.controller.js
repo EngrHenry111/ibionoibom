@@ -136,15 +136,18 @@ export const updateLeader = async (req, res) => {
     const leader = await Leader.findById(req.params.id);
 
     if (!leader) {
-      return res.status(404).json({ message: "Leader not found" });
+      return res.status(404).json({
+        message: "Leader not found"
+      });
     }
 
-    leader.fullName = req.body.fullName;
-    leader.position = req.body.position;
-    leader.bio = req.body.bio;
-    leader.tenure = req.body.tenure;
-    leader.status = req.body.status;
+    leader.fullName = req.body.fullName || leader.fullName;
+    leader.position = req.body.position || leader.position;
+    leader.bio = req.body.bio || leader.bio;
+    leader.tenure = req.body.tenure || leader.tenure;
+    leader.status = req.body.status || leader.status;
 
+    // CLOUDINARY IMAGE UPDATE
     if (req.file) {
       leader.imageUrl = req.file.path;
     }
@@ -163,7 +166,6 @@ export const updateLeader = async (req, res) => {
 
   }
 };
-
 // export const updateLeader = async (req, res) => {
 //   try {
 //     const { fullName, position, bio, tenure, status } = req.body;

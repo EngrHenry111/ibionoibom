@@ -370,25 +370,24 @@ export const getNewsById = async (req, res) => {
 //     res.status(500).json({ message: "Failed to update news" });
 //   }
 // };
-
 export const updateNews = async (req, res) => {
   try {
 
     const news = await News.findById(req.params.id);
 
     if (!news) {
-      return res.status(404).json({ message: "News not found" });
+      return res.status(404).json({
+        message: "News not found"
+      });
     }
 
     news.title = req.body.title || news.title;
     news.content = req.body.content || news.content;
+    news.status = req.body.status || news.status;
 
-    /* ======================
-       IMAGE FIX
-    ====================== */
-
+    // CLOUDINARY MULTIPLE IMAGES
     if (req.files && req.files.length > 0) {
-      news.images = req.files.map(file => file.filename);
+      news.images = req.files.map(file => file.path);
     }
 
     await news.save();
@@ -396,7 +395,12 @@ export const updateNews = async (req, res) => {
     res.json(news);
 
   } catch (error) {
+
     console.error("UPDATE NEWS ERROR:", error);
-    res.status(500).json({ message: "Failed to update news" });
+
+    res.status(500).json({
+      message: "Failed to update news"
+    });
+
   }
 };
