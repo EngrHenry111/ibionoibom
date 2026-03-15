@@ -124,43 +124,79 @@ export const getLeaderById = async (req, res) => {
 /* ===============================
    UPDATE LEADER
 ================================ */
+
 export const updateLeader = async (req, res) => {
   try {
-    const { fullName, position, bio, tenure, status } = req.body;
 
-    const updateData = {
-      fullName,
-      position,
-      bio,
-      status,
-    };
+    const leader = await Leader.findById(req.params.id);
 
-    // Only update tenure if it is valid
-    if (tenure && tenure !== "") {
-      updateData.tenure = tenure;
-    }
-
-    if (req.file) {
-      updateData.imageUrl = req.file.filename;
-    }
-
-    const updated = await Leader.findByIdAndUpdate(
-      req.params.id,
-      updateData,
-      { new: true }
-    );
-
-    if (!updated) {
+    if (!leader) {
       return res.status(404).json({ message: "Leader not found" });
     }
 
-    res.json(updated);
+    /* ======================
+       UPDATE DATA
+    ====================== */
+
+    leader.fullName = req.body.fullName || leader.fullName;
+    leader.position = req.body.position || leader.position;
+    leader.bio = req.body.bio || leader.bio;
+    leader.tenure = req.body.tenure || leader.tenure;
+
+    /* ======================
+       IMAGE UPDATE FIX
+    ====================== */
+
+    if (req.file) {
+      leader.imageUrl = req.file.filename;
+    }
+
+    await leader.save();
+
+    res.json(leader);
 
   } catch (error) {
     console.error("UPDATE LEADER ERROR:", error);
     res.status(500).json({ message: "Failed to update leader" });
   }
 };
+// export const updateLeader = async (req, res) => {
+//   try {
+//     const { fullName, position, bio, tenure, status } = req.body;
+
+//     const updateData = {
+//       fullName,
+//       position,
+//       bio,
+//       status,
+//     };
+
+//     // Only update tenure if it is valid
+//     if (tenure && tenure !== "") {
+//       updateData.tenure = tenure;
+//     }
+
+//     if (req.file) {
+//       updateData.imageUrl = req.file.filename;
+//     }
+
+//     const updated = await Leader.findByIdAndUpdate(
+//       req.params.id,
+//       updateData,
+//       { new: true }
+//     );
+
+//     if (!updated) {
+//       return res.status(404).json({ message: "Leader not found" });
+//     }
+
+//     res.json(updated);
+
+//   } catch (error) {
+//     console.error("UPDATE LEADER ERROR:", error);
+//     res.status(500).json({ message: "Failed to update leader" });
+//   }
+// };
 
 /* ===============================
    DELETE LEADER

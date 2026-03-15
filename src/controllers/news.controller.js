@@ -330,41 +330,71 @@ export const getNewsById = async (req, res) => {
 };
 
 
+// export const updateNews = async (req, res) => {
+//   try {
+//     const { title, content, existingImages } = req.body;
+
+//     const news = await News.findById(req.params.id);
+//     if (!news) {
+//       return res.status(404).json({ message: "News not found" });
+//     }
+
+//     // Update fields
+//     news.title = title;
+//     news.content = content;
+
+//     // Handle images
+//     let finalImages = [];
+
+//     // Existing images kept
+//     if (existingImages) {
+//       if (Array.isArray(existingImages)) {
+//         finalImages = existingImages;
+//       } else {
+//         finalImages = [existingImages];
+//       }
+//     }
+
+//     // New uploads
+//     if (req.files && req.files.length > 0) {
+//       const newImages = req.files.map((f) => f.filename);
+//       finalImages = [...finalImages, ...newImages];
+//     }
+
+//     news.images = finalImages;
+
+//     await news.save();
+//     res.json(news);
+//   } catch (error) {
+//     console.error("UPDATE NEWS ERROR:", error);
+//     res.status(500).json({ message: "Failed to update news" });
+//   }
+// };
+
 export const updateNews = async (req, res) => {
   try {
-    const { title, content, existingImages } = req.body;
 
     const news = await News.findById(req.params.id);
+
     if (!news) {
       return res.status(404).json({ message: "News not found" });
     }
 
-    // Update fields
-    news.title = title;
-    news.content = content;
+    news.title = req.body.title || news.title;
+    news.content = req.body.content || news.content;
 
-    // Handle images
-    let finalImages = [];
+    /* ======================
+       IMAGE FIX
+    ====================== */
 
-    // Existing images kept
-    if (existingImages) {
-      if (Array.isArray(existingImages)) {
-        finalImages = existingImages;
-      } else {
-        finalImages = [existingImages];
-      }
-    }
-
-    // New uploads
     if (req.files && req.files.length > 0) {
-      const newImages = req.files.map((f) => f.filename);
-      finalImages = [...finalImages, ...newImages];
+      news.images = req.files.map(file => file.filename);
     }
-
-    news.images = finalImages;
 
     await news.save();
+
     res.json(news);
+
   } catch (error) {
     console.error("UPDATE NEWS ERROR:", error);
     res.status(500).json({ message: "Failed to update news" });
