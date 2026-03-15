@@ -22,41 +22,46 @@ import mongoose from "mongoose";
 //     res.status(500).json({ message: "Failed to create leader" });
 //   }
 // };
+
 export const createLeader = async (req, res) => {
   try {
-    const { fullName, position, bio, tenure, status } = req.body;
-
-    if (!fullName || !position || !tenure) {
-      return res.status(400).json({
-        message: "Full name, position and tenure are required",
-      });
-    }
-
-    const imageUrl = req.file ? req.file.path : null;
 
     const leader = await Leader.create({
-      fullName,
-      position,
-      bio,
-      tenure,
-      status: status || "draft",
-      imageUrl,
+      fullName: req.body.fullName,
+      position: req.body.position,
+      bio: req.body.bio,
+      tenure: req.body.tenure,
+      status: req.body.status || "draft",
+      imageUrl: req.file?.path // Cloudinary URL
     });
 
-await Archive.create({
-title: leader.fullName,
-description: leader.position,
-category: "leader",
-year: leader.tenure?.startYear,
-tags: ["leadership","chairman"],
-referenceId: leader._id
-});
+    /* ===============================
+       CREATE ARCHIVE RECORD
+    ============================== */
+
+    if (leader.status === "published") {
+
+      await Archive.create({
+        title: leader.fullName,
+        description: leader.position,
+        category: "leader",
+        year: leader.tenure,
+        tags: ["leadership", "chairman"],
+        referenceId: leader._id
+      });
+
+    }
 
     res.status(201).json(leader);
 
   } catch (error) {
+
     console.error("CREATE LEADER ERROR:", error);
-    res.status(500).json({ message: error.message });
+
+    res.status(500).json({
+      message: "Failed to create leader"
+    });
+
   }
 };
 // export const createLeader = async (req, res) => {
@@ -134,34 +139,28 @@ export const updateLeader = async (req, res) => {
       return res.status(404).json({ message: "Leader not found" });
     }
 
-    /* ======================
-       UPDATE DATA
-    ====================== */
-
-    leader.fullName = req.body.fullName || leader.fullName;
-    leader.position = req.body.position || leader.position;
-    leader.bio = req.body.bio || leader.bio;
-    leader.tenure = req.body.tenure || leader.tenure;
-    leader.status = req.body.status || leader.status;
-
-    /* ======================
-       IMAGE UPDATE
-    ====================== */
+    leader.fullName = req.body.fullName;
+    leader.position = req.body.position;
+    leader.bio = req.body.bio;
+    leader.tenure = req.body.tenure;
+    leader.status = req.body.status;
 
     if (req.file) {
-      leader.imageUrl = req.file.filename;
+      leader.imageUrl = req.file.path;
     }
 
     await leader.save();
 
-    res.json({
-      message: "Leader updated successfully",
-      leader
-    });
+    res.json(leader);
 
   } catch (error) {
+
     console.error("UPDATE LEADER ERROR:", error);
-    res.status(500).json({ message: "Failed to update leader" });
+
+    res.status(500).json({
+      message: "Failed to update leader"
+    });
+
   }
 };
 
