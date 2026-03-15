@@ -124,7 +124,6 @@ export const getLeaderById = async (req, res) => {
 /* ===============================
    UPDATE LEADER
 ================================ */
-
 export const updateLeader = async (req, res) => {
   try {
 
@@ -142,9 +141,10 @@ export const updateLeader = async (req, res) => {
     leader.position = req.body.position || leader.position;
     leader.bio = req.body.bio || leader.bio;
     leader.tenure = req.body.tenure || leader.tenure;
+    leader.status = req.body.status || leader.status;
 
     /* ======================
-       IMAGE UPDATE FIX
+       IMAGE UPDATE
     ====================== */
 
     if (req.file) {
@@ -153,13 +153,17 @@ export const updateLeader = async (req, res) => {
 
     await leader.save();
 
-    res.json(leader);
+    res.json({
+      message: "Leader updated successfully",
+      leader
+    });
 
   } catch (error) {
     console.error("UPDATE LEADER ERROR:", error);
     res.status(500).json({ message: "Failed to update leader" });
   }
 };
+
 // export const updateLeader = async (req, res) => {
 //   try {
 //     const { fullName, position, bio, tenure, status } = req.body;
