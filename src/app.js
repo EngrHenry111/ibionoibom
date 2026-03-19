@@ -3,6 +3,7 @@ import cors from "cors";
 // import path from "path";
 import rateLimit from "express-rate-limit";
 import helmet from "helmet";
+import xss from "xss-clean"
 import authRoutes from "./routes/auth.routes.js";
 import leaderRoutes from "./routes/leader.routes.js";
 import departmentRoutes from "./routes/department.routes.js";
@@ -30,7 +31,8 @@ app.use(
   })
 );
 
-
+app.use(helmet());
+app.use(xss());
 // const limiter = rateLimit({
 //   windowMs: 15 * 1000, // 15 mins
 //   max: 100
@@ -40,7 +42,7 @@ app.use(
 app.use(rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 100
-}))
+}));
 
 
 // app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));

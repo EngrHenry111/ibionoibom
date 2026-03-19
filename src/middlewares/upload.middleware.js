@@ -6,11 +6,13 @@ import cloudinary from "../config/cloudinary.js";
    FILE FILTER
 ================================ */
 const fileFilter = (req, file, cb) => {
-  if (file.mimetype.startsWith("image/")) {
-    cb(null, true);
-  } else {
-    cb(new Error("Only image files allowed"), false);
+
+  if (!file.mimetype.startsWith("image/") && 
+  file.mimetype !== "application/pdf") {
+    return cb(new Error("Only images and PDFs allowed"), false);
   }
+
+  cb(null, true);
 };
 
 /* ===============================
@@ -48,6 +50,8 @@ export const uploadNewsImages = multer({
   storage: newsStorage,
   fileFilter,
 });
+
+
 
 
 

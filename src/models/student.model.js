@@ -3,14 +3,30 @@ import bcrypt from "bcryptjs";
 
 const studentSchema = new mongoose.Schema({
 
-  fullName: String,
+  fullName: {
+    type: String,
+    required: true
+  },
 
   email: {
     type: String,
-    unique: true
+    required: true,
+    unique: true,
+    lowercase: true,
+    match: [
+      /^\S+@\S+\.\S+$/,
+      "Please use a valid email"
+    ]
   },
 
-  password: String
+  password: {
+    type: String,
+    required: true,
+    minlength: 6
+  },
+
+  resetToken: String,
+  resetTokenExpire: Date
 
 }, { timestamps: true });
 
@@ -25,7 +41,7 @@ studentSchema.pre("save", async function(next){
 
 });
 
-/* COMPARE PASSWORD */
+/* MATCH PASSWORD */
 studentSchema.methods.matchPassword = async function(password){
   return await bcrypt.compare(password,this.password);
 };

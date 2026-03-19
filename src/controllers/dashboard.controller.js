@@ -1,6 +1,8 @@
 import News from "../models/News.js";
 import Leader from "../models/Leader.js";
 import Department from "../models/Department.js";
+import { sendEmail } from "../utils/sendEmails.js";
+import app from "../app.js";
 
 export const getDashboardStats = async (req, res) => {
   try {
@@ -26,3 +28,34 @@ export const getDashboardStats = async (req, res) => {
     res.status(500).json({ message: "Failed to fetch dashboard stats" });
   }
 };
+
+
+
+
+
+// import Bursary from "../models/bursary.model.js";
+
+// export const getDashboardStats = async (req, res) => {
+//   try {
+
+//     const total = await Bursary.countDocuments();
+
+        // await sendEmail(
+        //   app.email, "Bursary Status",
+        //   `Your application is ${app.status}`
+        // );
+//     const approved = await Bursary.countDocuments({ status: "approved" });
+//     const rejected = await Bursary.countDocuments({ status: "rejected" });
+//     const pending = await Bursary.countDocuments({ status: "pending" });
+
+//     res.json({
+//       total,
+//       approved,
+//       rejected,
+//       pending
+//     });
+
+//   } catch (error) {
+//     res.status(500).json({ message: "Failed to load stats" });
+//   }
+// };

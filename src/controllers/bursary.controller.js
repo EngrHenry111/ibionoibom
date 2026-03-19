@@ -1,5 +1,8 @@
 import Bursary from "../models/bursary.model.js";
 import crypto from "crypto";
+import PDFDocument from "pdfkit";
+
+
 
 /* GENERATE TRACKING ID */
 const generateTrackingId = () => {
@@ -20,19 +23,27 @@ try{
     }
 
 const existing = await Bursary.findOne({
-  email: req.body.email
+  $or: [
+    { email: req.body.email },
+    { matricNumber: req.body.matricNumber },
+    { bvn: req.body.bvn }
+  ]
 });
 
-/* PREVENT DUPLICATE */
-if(existing){
+if (existing) {
   return res.status(400).json({
-    message:"You already applied"
+    message: "Duplicate application detected"
   });
 }
 
-const application = await Bursary.create({
 
-...req.body,
+const verificationCode = crypto.randomBytes(8).toString("hex");
+
+const application = await Bursary.create({
+  ...req.body,
+  user: req.user.id,
+  verificationCode,
+
 
 trackingId: generateTrackingId(),
 
@@ -60,30 +71,104 @@ message:"Application failed"
 
 
 
+import PDFDocument from "pdfkit";
+import QRCode from "qrcode";
+import path from "path";
+
 export const generateLetter = async (req, res) => {
   try {
-
     const app = await Bursary.findById(req.params.id);
 
-    if (!app) {
-      return res.status(404).json({ message: "Application not found" });
-    }
-
-    if (app.status !== "approved") {
+    if (!app || app.status !== "approved") {
       return res.status(400).json({
-        message: "Application not approved yet"
+        message: "Application not approved",
       });
     }
 
-    res.send(`
-      <h1>Ibiono Ibom LGA</h1>
-      <p>Congratulations ${app.fullName}</p>
-      <p>Your bursary has been approved.</p>
-      <p>Tracking ID: ${app.trackingId}</p>
-    `);
+    const verificationUrl = `https://ibionoibom.gov.ng/verify/${app.verificationCode}`;
 
+    const qrImage = await QRCode.toDataURL(verificationUrl);
+
+    const doc = new PDFDocument({ margin: 50 });
+
+    res.setHeader("Content-Type", "application/pdf");
+    res.setHeader(
+      "Content-Disposition",
+      `attachment; filename=${app.fullName}-bursary.pdf`
+    );
+
+    doc.pipe(res);
+
+    /* ================= LOGO ================= */
+    const logoPath = path.join("uploads/assets/logo.png");
+
+    doc.image(logoPath, 250, 30, { width: 80 });
+
+    doc.moveDown(3);
+
+    /* ================= HEADER ================= */
+    doc
+      .fontSize(18)
+      .text("IBIONO IBOM LOCAL GOVERNMENT AREA", {
+        align: "center",
+      });
+
+    doc.fontSize(14).text("BURSARY APPROVAL CERTIFICATE", {
+      align: "center",
+    });
+
+    doc.moveDown(2);
+
+    /* ================= BODY ================= */
+    doc.fontSize(12);
+
+    doc.text(`Date: ${new Date().toLocaleDateString()}`);
+    doc.moveDown();
+
+    doc.text(`This is to certify that:`);
+
+    doc.moveDown();
+
+    doc.fontSize(16).text(app.fullName, { align: "center" });
+
+    doc.moveDown();
+
+    doc.fontSize(12).text(
+      `has been approved for bursary support under Ibiono Ibom LGA.`
+    );
+
+    doc.moveDown();
+
+    doc.text(`Institution: ${app.institution}`);
+    doc.text(`Account Number: ${app.accountNumber}`);
+    doc.text(`Bank: ${app.bankName}`);
+    doc.text(`Tracking ID: ${app.trackingId}`);
+
+    doc.moveDown(2);
+
+    doc.text("This certificate is valid and verifiable online.");
+
+    doc.moveDown(2);
+
+    /* ================= QR CODE ================= */
+    doc.image(qrImage, 220, doc.y, { width: 100 });
+
+    doc.moveDown(4);
+
+    doc.text("Scan QR code to verify authenticity", {
+      align: "center",
+    });
+
+    doc.moveDown(3);
+
+    /* ================= SIGNATURE ================= */
+    doc.text("__________________________", { align: "left" });
+    doc.text("Executive Chairman", { align: "left" });
+
+    doc.end();
   } catch (error) {
-    res.status(500).json({ message: "Failed to generate letter" });
+    console.error(error);
+    res.status(500).json({ message: "Failed to generate certificate" });
   }
 };
 
@@ -136,19 +221,48 @@ export const updateApplicationStatus = async (req, res) => {
 
 };
 
-
 export const downloadLetter = async (req, res) => {
 
   const app = await Bursary.findById(req.params.id);
 
-  if (app.status !== "approved") {
-    return res.status(400).send("Not approved");
-  }
+  const doc = new PDFDocument();
 
-  res.send(`
-    <h1>Ibiono Ibom LGA</h1>
-    <p>Dear ${app.fullName}</p>
-    <p>Your bursary application has been approved.</p>
-    <p>Tracking ID: ${app.trackingId}</p>
-  `);
+  res.setHeader("Content-Type", "application/pdf");
+
+  doc.pipe(res);
+
+  doc.fontSize(18).text("Ibiono Ibom LGA", { align: "center" });
+
+  doc.moveDown();
+
+  doc.text(`Name: ${app.fullName}`);
+  doc.text(`Tracking ID: ${app.trackingId}`);
+  doc.text(`Status: Approved`);
+
+  doc.end();
+};
+
+
+
+export const verifyBursary = async (req, res) => {
+  try {
+    const app = await Bursary.findOne({
+      verificationCode: req.params.code,
+    });
+
+    if (!app) {
+      return res.status(404).json({
+        message: "Invalid certificate",
+      });
+    }
+
+    res.json({
+      name: app.fullName,
+      institution: app.institution,
+      status: app.status,
+      trackingId: app.trackingId,
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Verification failed" });
+  }
 };
