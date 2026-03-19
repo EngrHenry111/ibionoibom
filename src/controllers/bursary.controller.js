@@ -1,6 +1,8 @@
 import Bursary from "../models/bursary.model.js";
 import crypto from "crypto";
 import PDFDocument from "pdfkit";
+import QRCode from "qrcode";
+import path from "path";
 
 
 
@@ -71,9 +73,6 @@ message:"Application failed"
 
 
 
-import PDFDocument from "pdfkit";
-import QRCode from "qrcode";
-import path from "path";
 
 export const generateLetter = async (req, res) => {
   try {
@@ -85,7 +84,7 @@ export const generateLetter = async (req, res) => {
       });
     }
 
-    const verificationUrl = `https://ibionoibom.gov.ng/verify/${app.verificationCode}`;
+    const verificationUrl = `https://ibionoibomlga.vercel.app/verify/${app.verificationCode}`;
 
     const qrImage = await QRCode.toDataURL(verificationUrl);
 
