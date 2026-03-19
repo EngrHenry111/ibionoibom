@@ -3,7 +3,7 @@ import cors from "cors";
 // import path from "path";
 import rateLimit from "express-rate-limit";
 import helmet from "helmet";
-import xss from "xss-clean"
+import xss from "xss-clean";
 import authRoutes from "./routes/auth.routes.js";
 import leaderRoutes from "./routes/leader.routes.js";
 import departmentRoutes from "./routes/department.routes.js";
@@ -12,8 +12,8 @@ import mediaRoutes from "./routes/media.routes.js";
 import tenureRoutes from "./routes/tenure.routes.js";
 import dashboardRoutes from "./routes/dashboard.routes.js"
 import archiveRoutes from "./routes/archive.routes.js"
-// import bursaryRoutes from 
-// import studentRoutes
+import bursaryRoutes from "./routes/bursary.routes.js";
+import studentRoutes from "./routes/student.routes.js"
 
 const app = express();
 app.use(cors());
@@ -59,7 +59,7 @@ app.use("/api/media", mediaRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/archive", archiveRoutes);
 
-// app.use("/api/bursary", bursaryRoutes);
-// app.use("/api/students", studentRoutes);
+app.use("/api/bursary", bursaryRoutes);
+app.use("/api/students", studentRoutes);
 
 export default app;
