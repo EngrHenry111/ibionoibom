@@ -54,7 +54,7 @@ const bursarySchema = new mongoose.Schema(
 );
 
 /* INDEXES FOR SEARCH + PERFORMANCE */
-bursarySchema.index({ trackingId: 1 });
+// bursarySchema.index({ trackingId: 1 });
 bursarySchema.index({ email: 1 });
 bursarySchema.index({ status: 1 });
 
