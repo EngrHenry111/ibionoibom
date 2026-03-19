@@ -135,33 +135,33 @@ export const getProfile = async (req, res) => {
 
 
 
-// /* FORGOT PASSWORD */
-// export const forgotPassword = async (req, res) => {
+/* FORGOT PASSWORD */
+export const forgotPassword = async (req, res) => {
 
-//   const user = await Student.findOne({ email: req.body.email });
+  const user = await Student.findOne({ email: req.body.email });
 
-//   if (!user) {
-//     return res.status(404).json({ message: "Email not found" });
-//   }
+  if (!user) {
+    return res.status(404).json({ message: "Email not found" });
+  }
 
-//   const resetToken = crypto.randomBytes(32).toString("hex");
+  const resetToken = crypto.randomBytes(32).toString("hex");
 
-//   user.resetToken = resetToken;
+  user.resetToken = resetToken;
 
-//   user.resetTokenExpire = Date.now() + 15 * 60 * 1000; // 15 mins
+  user.resetTokenExpire = Date.now() + 15 * 60 * 1000; // 15 mins
 
-//   await user.save();
+  await user.save();
 
-//   const resetUrl = `${process.env.CLIENT_URL}/reset-password/${resetToken}`;
+  const resetUrl = `${process.env.CLIENT_URL}/reset-password/${resetToken}`;
 
-//   await sendEmail(
-//     user.email,
-//     "Password Reset",
-//     `Click to reset password: ${resetUrl}`
-//   );
+  await sendEmail(
+    user.email,
+    "Password Reset",
+    `Click to reset password: ${resetUrl}`
+  );
 
-//   res.json({ message: "Reset link sent to email" });
-// };
+  res.json({ message: "Reset link sent to email" });
+};
 
 
 export const resetPassword = async (req, res) => {
