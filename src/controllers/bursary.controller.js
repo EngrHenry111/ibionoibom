@@ -7,13 +7,11 @@ import path from "path";
 
 
 /* GENERATE TRACKING ID */
-const generateTrackingId = () => {
-  return "IBB-" + crypto.randomBytes(4).toString("hex").toUpperCase();
-};
+// const generateTrackingId = () => {
+//   return "IBB-" + crypto.randomBytes(4).toString("hex").toUpperCase();
+// };
 
-/* APPLY */
-import Bursary from "../models/bursary.model.js";
-import crypto from "crypto";
+
 
 /* ================= APPLY BURSARY ================= */
 export const applyBursary = async (req, res) => {
@@ -308,7 +306,6 @@ export const downloadLetter = async (req, res) => {
 
   doc.end();
 };
-
 
 
 export const verifyBursary = async (req, res) => {
