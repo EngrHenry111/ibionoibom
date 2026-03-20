@@ -9,32 +9,33 @@ import {
 } from "../controllers/bursary.controller.js";
 
 import { protectStudent } from "../middlewares/studentAuth.middleware.js";
-import { protect } from "../middlewares/auth.middleware.js"; // admin
+import { protect } from "../middlewares/auth.middleware.js";
+import { upload } from "../middlewares/upload.middleware.js";
 
 const router = express.Router();
 
-/* ================= STUDENT ROUTES ================= */
+/* ================= APPLY ================= */
+router.post(
+  "/apply",
+  protectStudent,
+  upload.fields([
+    { name: "passport", maxCount: 1 },
+    { name: "admissionLetter", maxCount: 1 },
+    { name: "studentID", maxCount: 1 },
+    { name: "lgaCertificate", maxCount: 1 },
+  ]),
+  applyBursary
+);
 
-// Apply for bursary
-router.post("/apply", protectStudent, applyBursary);
-
-// Get logged-in student's applications
+/* ================= STUDENT ================= */
 router.get("/my", protectStudent, getMyApplications);
 
-/* ================= ADMIN ROUTES ================= */
-
-// Get all applications (admin)
+/* ================= ADMIN ================= */
 router.get("/", protect, getAllApplications);
-
-// Update status (approve/reject)
 router.patch("/:id/status", protect, updateApplicationStatus);
 
-/* ================= PUBLIC ROUTES ================= */
-
-// Download approval letter
+/* ================= PUBLIC ================= */
 router.get("/letter/:id", generateLetter);
-
-// Verify certificate
 router.get("/verify/:code", verifyBursary);
 
 export default router;

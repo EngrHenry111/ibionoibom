@@ -12,65 +12,133 @@ const generateTrackingId = () => {
 };
 
 /* APPLY */
-export const applyBursary = async (req,res)=>{
+import Bursary from "../models/bursary.model.js";
+import crypto from "crypto";
 
-try{
+/* ================= APPLY BURSARY ================= */
+export const applyBursary = async (req, res) => {
+  try {
+    /* ================= VALIDATION ================= */
 
-  
-    // ✅ BVN VALIDATION
-    if (!req.body.bvn || req.body.bvn.length !== 11) {
+    const {
+      fullName,
+      email,
+      phone,
+      matricNumber,
+      institution,
+      course,
+      level,
+      lga,
+      accountNumber,
+      bankName,
+      bvn,
+      nin,
+    } = req.body;
+
+    // 🔒 Required fields
+    if (
+      !fullName ||
+      !email ||
+      !phone ||
+      !matricNumber ||
+      !accountNumber ||
+      !bankName ||
+      !bvn ||
+      !nin
+    ) {
       return res.status(400).json({
-        message: "Invalid BVN (must be 11 digits)"
+        message: "All required fields must be filled",
       });
     }
 
-const existing = await Bursary.findOne({
-  $or: [
-    { email: req.body.email },
-    { matricNumber: req.body.matricNumber },
-    { bvn: req.body.bvn }
-  ]
-});
+    // 🔒 BVN & NIN validation
+    if (bvn.length !== 11) {
+      return res.status(400).json({
+        message: "BVN must be exactly 11 digits",
+      });
+    }
 
-if (existing) {
-  return res.status(400).json({
-    message: "Duplicate application detected"
-  });
-}
+    if (nin.length !== 11) {
+      return res.status(400).json({
+        message: "NIN must be exactly 11 digits",
+      });
+    }
 
+    /* ================= DUPLICATE CHECK ================= */
 
-const verificationCode = crypto.randomBytes(8).toString("hex");
+    const existing = await Bursary.findOne({
+      $or: [
+        { email },
+        { matricNumber },
+        { bvn },
+        { nin },
+      ],
+    });
 
-const application = await Bursary.create({
-  ...req.body,
-  user: req.user.id,
-  verificationCode,
+    if (existing) {
+      return res.status(400).json({
+        message: "You have already applied",
+      });
+    }
 
+    /* ================= FILES ================= */
 
-trackingId: generateTrackingId(),
+    const passport = req.files?.passport?.[0]?.path || "";
+    const admissionLetter = req.files?.admissionLetter?.[0]?.path || "";
+    const studentID = req.files?.studentID?.[0]?.path || "";
+    const lgaCertificate = req.files?.lgaCertificate?.[0]?.path || "";
 
-passport: req.files.passport?.[0]?.path,
-admissionLetter: req.files.admissionLetter?.[0]?.path,
-studentID: req.files.studentID?.[0]?.path,
-lgaCertificate: req.files.lgaCertificate?.[0]?.path,
+    /* ================= GENERATE IDS ================= */
 
-user: req.user?.id
+    const trackingId =
+      "IBB-" + crypto.randomBytes(4).toString("hex").toUpperCase();
 
-});
+    const verificationCode = crypto.randomBytes(8).toString("hex");
 
-res.status(201).json(application);
+    /* ================= CREATE ================= */
 
-}catch(error){
+    const application = await Bursary.create({
+      fullName,
+      email,
+      phone,
+      matricNumber,
+      institution,
+      course,
+      level,
+      lga,
 
-console.error(error);
+      accountNumber,
+      bankName,
 
-res.status(500).json({
-message:"Application failed"
-});
+      bvn,
+      nin,
 
-}
+      passport,
+      admissionLetter,
+      studentID,
+      lgaCertificate,
+
+      trackingId,
+      verificationCode,
+
+      user: req.user?._id, // from protectStudent
+    });
+
+    /* ================= RESPONSE ================= */
+
+    res.status(201).json({
+      message: "Application submitted successfully",
+      trackingId: application.trackingId,
+    });
+
+  } catch (error) {
+    console.error("APPLY BURSARY ERROR:", error);
+
+    res.status(500).json({
+      message: "Failed to submit application",
+    });
+  }
 };
-
 
 
 
