@@ -21,43 +21,59 @@ import path from "path";
 /* ================= APPLY BURSARY ================= */
 export const applyBursary = async (req, res) => {
   try {
+    /* ================= GET DATA ================= */
+    const {
+      fullName,
+      email,
+      phone,
+      matricNumber,
+      institution,
+      course,
+      level,
+      lga,
+      accountNumber,
+      bankName,
+      bvn,
+      nin,
+    } = req.body;
+
+    /* ================= BASIC VALIDATION ================= */
+    if (
+      !fullName ||
+      !email ||
+      !phone ||
+      !matricNumber ||
+      !accountNumber ||
+      !bankName ||
+      !bvn ||
+      !nin
+    ) {
+      return res.status(400).json({
+        message: "All required fields must be filled",
+      });
+    }
+
     /* ================= IDENTITY VALIDATION ================= */
-
-if (!validateBVN(bvn)) {
-  return res.status(400).json({
-    message: "Invalid BVN format",
-  });
-}
-
-if (!validateNIN(nin)) {
-  return res.status(400).json({
-    message: "Invalid NIN format",
-  });
-}
-
-/* ================= FRAUD DETECTION ================= */
-
-const isFraud = await detectFraud(Bursary, {
-  email,
-  bvn,
-  nin,
-});
-
-    // 🔒 BVN & NIN validation
-    if (bvn.length !== 11) {
+    if (!validateBVN(bvn)) {
       return res.status(400).json({
-        message: "BVN must be exactly 11 digits",
+        message: "Invalid BVN format",
       });
     }
 
-    if (nin.length !== 11) {
+    if (!validateNIN(nin)) {
       return res.status(400).json({
-        message: "NIN must be exactly 11 digits",
+        message: "Invalid NIN format",
       });
     }
+
+    /* ================= FRAUD DETECTION ================= */
+    const isFraud = await detectFraud(Bursary, {
+      email,
+      bvn,
+      nin,
+    });
 
     /* ================= DUPLICATE CHECK ================= */
-
     const existing = await Bursary.findOne({
       $or: [
         { email },
@@ -74,21 +90,18 @@ const isFraud = await detectFraud(Bursary, {
     }
 
     /* ================= FILES ================= */
-
     const passport = req.files?.passport?.[0]?.path || "";
     const admissionLetter = req.files?.admissionLetter?.[0]?.path || "";
     const studentID = req.files?.studentID?.[0]?.path || "";
     const lgaCertificate = req.files?.lgaCertificate?.[0]?.path || "";
 
     /* ================= GENERATE IDS ================= */
-
     const trackingId =
       "IBB-" + crypto.randomBytes(4).toString("hex").toUpperCase();
 
     const verificationCode = crypto.randomBytes(8).toString("hex");
 
     /* ================= CREATE ================= */
-
     const application = await Bursary.create({
       fullName,
       email,
@@ -113,14 +126,14 @@ const isFraud = await detectFraud(Bursary, {
       trackingId,
       verificationCode,
 
-      user: req.user?._id, // from protectStudent
-      // New Field
-      verificaionStatus: isFraud ? "failed" : "verified",
+      user: req.user?._id,
+
+      // ✅ FIXED
+      verificationStatus: isFraud ? "failed" : "verified",
       fraudFlag: isFraud,
     });
 
     /* ================= RESPONSE ================= */
-
     res.status(201).json({
       message: "Application submitted successfully",
       trackingId: application.trackingId,
@@ -129,13 +142,24 @@ const isFraud = await detectFraud(Bursary, {
   } catch (error) {
     console.error("APPLY BURSARY ERROR:", error);
 
+    /* ================= MULTER ERROR HANDLING ================= */
+    if (error.message?.includes("File too large")) {
+      return res.status(400).json({
+        message: "File size should not exceed 2MB",
+      });
+    }
+
+    if (error.message?.includes("must be")) {
+      return res.status(400).json({
+        message: error.message,
+      });
+    }
+
     res.status(500).json({
       message: "Failed to submit application",
     });
   }
 };
-
-
 
 export const generateLetter = async (req, res) => {
   try {
