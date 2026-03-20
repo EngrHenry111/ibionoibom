@@ -1,4 +1,9 @@
 import Bursary from "../models/bursary.model.js";
+import {
+  validateBVN,
+  validateNIN,
+  detectFraud,
+} from "../services/identity.services.js"
 import crypto from "crypto";
 import PDFDocument from "pdfkit";
 import QRCode from "qrcode";
@@ -16,38 +21,27 @@ import path from "path";
 /* ================= APPLY BURSARY ================= */
 export const applyBursary = async (req, res) => {
   try {
-    /* ================= VALIDATION ================= */
+    /* ================= IDENTITY VALIDATION ================= */
 
-    const {
-      fullName,
-      email,
-      phone,
-      matricNumber,
-      institution,
-      course,
-      level,
-      lga,
-      accountNumber,
-      bankName,
-      bvn,
-      nin,
-    } = req.body;
+if (!validateBVN(bvn)) {
+  return res.status(400).json({
+    message: "Invalid BVN format",
+  });
+}
 
-    // 🔒 Required fields
-    if (
-      !fullName ||
-      !email ||
-      !phone ||
-      !matricNumber ||
-      !accountNumber ||
-      !bankName ||
-      !bvn ||
-      !nin
-    ) {
-      return res.status(400).json({
-        message: "All required fields must be filled",
-      });
-    }
+if (!validateNIN(nin)) {
+  return res.status(400).json({
+    message: "Invalid NIN format",
+  });
+}
+
+/* ================= FRAUD DETECTION ================= */
+
+const isFraud = await detectFraud(Bursary, {
+  email,
+  bvn,
+  nin,
+});
 
     // 🔒 BVN & NIN validation
     if (bvn.length !== 11) {
@@ -120,6 +114,9 @@ export const applyBursary = async (req, res) => {
       verificationCode,
 
       user: req.user?._id, // from protectStudent
+      // New Field
+      verificaionStatus: isFraud ? "failed" : "verified",
+      fraudFlag: isFraud,
     });
 
     /* ================= RESPONSE ================= */

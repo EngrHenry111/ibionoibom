@@ -10,7 +10,7 @@ import {
 
 import { protectStudent } from "../middlewares/studentAuth.middleware.js";
 import { protect } from "../middlewares/auth.middleware.js";
-import { upload } from "../middlewares/upload.middleware.js";
+import { uploadBursaryDocuments } from "../middlewares/upload.middleware.js";
 
 const router = express.Router();
 
@@ -18,7 +18,7 @@ const router = express.Router();
 router.post(
   "/apply",
   protectStudent,
-  upload.fields([
+  uploadBursaryDocuments.fields([
     { name: "passport", maxCount: 1 },
     { name: "admissionLetter", maxCount: 1 },
     { name: "studentID", maxCount: 1 },
