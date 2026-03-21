@@ -20,6 +20,8 @@ import path from "path";
 /* ================= APPLY BURSARY ================= */
 export const applyBursary = async (req, res) => {
   try {
+    console.log("BODY:", req.body);
+    console.log("FILES:", req.files);
     /* ================= GET DATA ================= */
     const {
       fullName,
