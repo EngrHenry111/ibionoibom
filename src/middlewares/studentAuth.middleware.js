@@ -3,10 +3,16 @@ import Student from "../models/student.model.js";
 
 export const protectStudent = async (req, res, next) => {
   try {
-    const token = req.headers.authorization?.split(" ")[1];
+    let token;
+
+    if (req.headers.authorization?.startsWith("Bearer")) {
+      token = req.headers.authorization.split(" ")[1];
+    }
 
     if (!token) {
-      return res.status(401).json({ message: "No token" });
+      return res.status(401).json({
+        message: "No token, authorization denied",
+      });
     }
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
@@ -14,70 +20,18 @@ export const protectStudent = async (req, res, next) => {
     req.user = await Student.findById(decoded.id).select("-password");
 
     if (!req.user) {
-      return res.status(401).json({ message: "User not found" });
+      return res.status(401).json({
+        message: "User not found",
+      });
     }
 
-    next();
+    next(); // ✅ SAFE HERE
 
   } catch (error) {
     console.error("AUTH ERROR:", error);
-    res.status(401).json({ message: "Unauthorized" });
+
+    return res.status(401).json({
+      message: "Not authorized",
+    });
   }
 };
-
-
-// export const protectStudent = async (req, res, next) => {
-//   let token;
-
-//   if (req.headers.authorization?.startsWith("Bearer")) {
-//     token = req.headers.authorization.split(" ")[1];
-
-//     try {
-//       const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
-// 8      req.user = await Student.findById(decoded.id).select("-password");
-
-//       return next();
-//     } catch (error) {
-//       return res.status(401).json({
-//         message: "Invalid token",
-//       });
-//     }
-//   }
-
-//   // ❌ DO NOT BLOCK HERE
-//   return res.status(401).json({
-//     message: "Not authorized, no token",
-//   });
-// };
-
-
-
-// import jwt from "jsonwebtoken";
-// import Student from "../models/student.model.js";
-
-// export const protectStudent = async (req, res, next) => {
-//   let token;
-
-//   if (req.headers.authorization?.startsWith("Bearer")) {
-//     token = req.headers.authorization.split(" ")[1];
-
-//     try {
-//       const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
-//       req.user = await Student.findById(decoded.id).select("-password");
-
-//       next();
-//     } catch (error) {
-//       return res.status(401).json({
-//         message: "Not authorized",
-//       });
-//     }
-//   }
-
-//   if (!token) {
-//     return res.status(401).json({
-//       message: "No token",
-//     });
-//   }
-// };
