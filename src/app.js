@@ -61,6 +61,14 @@ app.use("/api/bursary", bursaryRoutes);
 app.use("/api/students", studentRoutes);
 
 
+process.on("uncaughtException", (err) => {
+  console.error("UNCAUGHT ERROR:", err);
+});
+
+process.on("unhandledRejection", (err) => {
+  console.error("UNHANDLED PROMISE:", err);
+});
+
 // 🔥 GLOBAL ERROR HANDLER (VERY IMPORTANT)
 app.use((err, req, res, next) => {
   console.error("GLOBAL ERROR:", err.message);

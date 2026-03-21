@@ -205,58 +205,93 @@ if (isFraud) {
   // }
 };
 
+
 export const generateLetter = async (req, res) => {
   try {
     const app = await Bursary.findById(req.params.id);
 
-    // ❗ CHECK IF FOUND
     if (!app) {
       return res.status(404).send("Application not found");
     }
 
-    // ❗ ONLY APPROVED CAN DOWNLOAD
     if (app.status !== "approved") {
-      return res.status(400).send("Only approved applications can download letter");
+      return res.status(400).send("Only approved applications allowed");
     }
 
-    res.setHeader("Content-Type", "text/html");
+    // 📄 Create PDF
+    const doc = new PDFDocument();
 
-    res.send(`
-      <html>
-        <head>
-          <title>Bursary Approval Letter</title>
-        </head>
-        <body style="font-family: Arial; padding: 20px;">
-          <h1>Ibiono Ibom LGA</h1>
-          <h2>Bursary Approval Letter</h2>
+    // 📌 Set headers for download
+    res.setHeader("Content-Type", "application/pdf");
+    res.setHeader(
+      "Content-Disposition",
+      `attachment; filename=bursary-${app.fullName}.pdf`
+    );
 
-          <p>Dear <strong>${app.fullName}</strong>,</p>
+    doc.pipe(res);
 
-          <p>
-            We are pleased to inform you that your bursary application
-            has been <strong>approved</strong>.
-          </p>
+    /* ================= HEADER ================= */
 
-          <p><strong>Tracking ID:</strong> ${app.trackingId}</p>
-          <p><strong>Institution:</strong> ${app.institution}</p>
+    doc
+      .fontSize(20)
+      .text("IBIONO IBOM LOCAL GOVERNMENT", { align: "center" });
 
-          <br/>
+    doc.moveDown();
 
-          <p>Congratulations 🎉</p>
+    doc
+      .fontSize(16)
+      .text("BURSARY APPROVAL LETTER", { align: "center" });
 
-          <p>Signed,</p>
-          <p>Ibiono Ibom Local Government</p>
-        </body>
-      </html>
-    `);
+    doc.moveDown(2);
+
+    /* ================= BODY ================= */
+
+    doc.fontSize(12);
+
+    doc.text(`Dear ${app.fullName},`);
+
+    doc.moveDown();
+
+    doc.text(
+      "We are pleased to inform you that your bursary application has been APPROVED by Ibiono Ibom Local Government Council."
+    );
+
+    doc.moveDown();
+
+    doc.text(`Institution: ${app.institution}`);
+    doc.text(`Course: ${app.course}`);
+    doc.text(`Tracking ID: ${app.trackingId}`);
+
+    doc.moveDown(2);
+
+    doc.text(
+      "This letter serves as an official confirmation of your bursary award."
+    );
+
+    doc.moveDown(3);
+
+    /* ================= SIGNATURE ================= */
+
+    doc.text("________________________");
+    doc.text("Chairman");
+    doc.text("Ibiono Ibom LGA");
+
+    doc.moveDown();
+
+    /* ================= STAMP STYLE ================= */
+
+    doc
+      .fontSize(10)
+      .fillColor("red")
+      .text("OFFICIAL STAMP", { align: "right" });
+
+    doc.end();
 
   } catch (error) {
-    console.error("LETTER ERROR:", error);
-
-    res.status(500).send("Server error generating letter");
+    console.error("PDF ERROR:", error);
+    res.status(500).send("Error generating PDF");
   }
 };
-
 
 export const getMyApplications = async (req, res) => {
   try {
