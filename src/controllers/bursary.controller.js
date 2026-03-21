@@ -173,26 +173,35 @@ if (isFraud) {
       trackingId: application.trackingId,
     });
 
-  } catch (error) {
-    console.error("APPLY BURSARY ERROR:", error);
+    } catch (error) {
+  console.error("🔥 APPLY BURSARY FULL ERROR:", error);
+  console.error("🔥 ERROR MESSAGE:", error.message);
+  console.error("🔥 ERROR STACK:", error.stack);
 
-    /* ================= MULTER ERROR HANDLING ================= */
-    if (error.message?.includes("File too large")) {
-      return res.status(400).json({
-        message: "File size should not exceed 2MB",
-      });
-    }
+  return res.status(500).json({
+    message: error.message || "Failed to submit application",
+  });
+}
+  // } catch (error) {
+  //   console.error("APPLY BURSARY ERROR:", error);
 
-    if (error.message?.includes("must be")) {
-      return res.status(400).json({
-        message: error.message,
-      });
-    }
+  //   /* ================= MULTER ERROR HANDLING ================= */
+  //   if (error.message?.includes("File too large")) {
+  //     return res.status(400).json({
+  //       message: "File size should not exceed 2MB",
+  //     });
+  //   }
 
-    res.status(500).json({
-      message: "Failed to submit application",
-    });
-  }
+  //   if (error.message?.includes("must be")) {
+  //     return res.status(400).json({
+  //       message: error.message,
+  //     });
+  //   }
+
+  //   res.status(500).json({
+  //     message: "Failed to submit application",
+  //   });
+  // }
 };
 
 export const generateLetter = async (req, res) => {
