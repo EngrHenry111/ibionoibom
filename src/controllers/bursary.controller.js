@@ -13,8 +13,8 @@ import {
 
 import crypto from "crypto";
 import PDFDocument from "pdfkit";
-import QRCode from "qrcode";
-import path from "path";
+// import QRCode from "qrcode";
+// import path from "path";
 import { sendEmail } from "../utils/sendEmails.js";
 
 
@@ -373,8 +373,10 @@ export const downloadLetter = async (req, res) => {
 
 export const verifyBursary = async (req, res) => {
   try {
+    const { code } = req.params;
+
     const app = await Bursary.findOne({
-      verificationCode: req.params.code,
+      verificationCode: code,
     });
 
     if (!app) {
@@ -388,7 +390,6 @@ export const verifyBursary = async (req, res) => {
       institution: app.institution,
       status: app.status,
       trackingId: app.trackingId,
-      year: app.createdAt,
     });
 
   } catch (error) {
@@ -399,7 +400,6 @@ export const verifyBursary = async (req, res) => {
     });
   }
 };
-
 
 
 export const getBursaryStats = async (req, res) => {
