@@ -380,17 +380,48 @@ export const verifyBursary = async (req, res) => {
 
     if (!app) {
       return res.status(404).json({
-        message: "Invalid certificate",
+        message: "Invalid or not found",
       });
     }
 
     res.json({
-      name: app.fullName,
+      fullName: app.fullName,
       institution: app.institution,
       status: app.status,
       trackingId: app.trackingId,
+      year: app.createdAt,
     });
+
   } catch (error) {
-    res.status(500).json({ message: "Verification failed" });
+    console.error("VERIFY ERROR:", error);
+
+    res.status(500).json({
+      message: "Verification failed",
+    });
+  }
+};
+
+
+
+export const getBursaryStats = async (req, res) => {
+  try {
+    const total = await Bursary.countDocuments();
+    const approved = await Bursary.countDocuments({ status: "approved" });
+    const pending = await Bursary.countDocuments({ status: "pending" });
+    const rejected = await Bursary.countDocuments({ status: "rejected" });
+
+    res.json({
+      total,
+      approved,
+      pending,
+      rejected,
+    });
+
+  } catch (error) {
+    console.error("STATS ERROR:", error);
+
+    res.status(500).json({
+      message: "Failed to fetch stats",
+    });
   }
 };

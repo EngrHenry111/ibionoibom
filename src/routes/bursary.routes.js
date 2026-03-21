@@ -6,6 +6,7 @@ import {
   updateApplicationStatus,
   generateLetter,
   verifyBursary,
+  getBursaryStats,
 } from "../controllers/bursary.controller.js";
 
 import { protectStudent } from "../middlewares/studentAuth.middleware.js";
@@ -53,5 +54,6 @@ router.patch("/:id/status", protect, updateApplicationStatus);
 /* ================= PUBLIC ================= */
 router.get("/letter/:id", generateLetter);
 router.get("/verify/:code", verifyBursary);
+router.get("/stats", protect, getBursaryStats)
 
 export default router;
