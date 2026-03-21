@@ -7,7 +7,7 @@ export const protectStudent = async (req, res, next) => {
     try {
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-      req.user = await Student.findById(decoded.id).select("-password");
+8      req.user = await Student.findById(decoded.id).select("-password");
 
       return next();
     } catch (error) {

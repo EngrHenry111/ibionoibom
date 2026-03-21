@@ -31,13 +31,26 @@ const studentSchema = new mongoose.Schema({
 }, { timestamps: true });
 
 /* HASH PASSWORD */
-studentSchema.pre("save", async function(next){
 
-  if(!this.isModified("password")) return next();
+studentSchema.pre("save", async function (next) {
+  try {
+    if (!this.isModified("password")) return next();
 
-  this.password = await bcrypt.hash(this.password,10);
+    this.password = await bcrypt.hash(this.password, 10);
 
-  next();
+    next(); // ✅ must be called properly
+  } catch (error) {
+    next(error); // ✅ VERY IMPORTANT FIX
+  }
+});
+
+// studentSchema.pre("save", async function(next){
+
+//   if(!this.isModified("password")) return next();
+
+//   this.password = await bcrypt.hash(this.password,10);
+
+//   next();
 
 });
 
