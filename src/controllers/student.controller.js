@@ -1,6 +1,8 @@
 import Student from "../models/student.model.js";
 import jwt from "jsonwebtoken";
 // import bcrypt from "bcryptjs";
+import crypto from "crypto";
+
 
 
 /* ================= TOKEN ================= */
@@ -158,33 +160,70 @@ export const getProfile = async (req, res) => {
 
 
 
-/* FORGOT PASSWORD */
 export const forgotPassword = async (req, res) => {
+  try {
+    const { email } = req.body;
 
-  const user = await Student.findOne({ email: req.body.email });
+    const user = await Student.findOne({ email });
 
-  if (!user) {
-    return res.status(404).json({ message: "Email not found" });
+    if (!user) {
+      return res.status(404).json({
+        message: "User not found",
+      });
+    }
+
+    // 🔐 Generate reset token
+    const resetToken = crypto.randomBytes(20).toString("hex");
+
+    user.resetToken = resetToken;
+    user.resetTokenExpire = Date.now() + 15 * 60 * 1000; // 15 mins
+
+    await user.save();
+
+    // ✅ Instead of email, return link
+    const resetUrl = `http://localhost:5173/bursary/reset-password/${resetToken}`;
+
+    res.json({
+      message: "Reset link generated",
+      resetUrl, // 🔥 IMPORTANT
+    });
+
+  } catch (error) {
+    console.error("FORGOT PASSWORD ERROR:", error);
+
+    res.status(500).json({
+      message: "Server error",
+    });
   }
-
-  const resetToken = crypto.randomBytes(32).toString("hex");
-
-  user.resetToken = resetToken;
-
-  user.resetTokenExpire = Date.now() + 15 * 60 * 1000; // 15 mins
-
-  await user.save();
-
-  const resetUrl = `${process.env.CLIENT_URL}/reset-password/${resetToken}`;
-
-  await sendEmail(
-    user.email,
-    "Password Reset",
-    `Click to reset password: ${resetUrl}`
-  );
-
-  res.json({ message: "Reset link sent to email" });
 };
+/* FORGOT PASSWORD */
+
+// export const forgotPassword = async (req, res) => {
+
+//   const user = await Student.findOne({ email: req.body.email });
+
+//   if (!user) {
+//     return res.status(404).json({ message: "Email not found" });
+//   }
+
+//   const resetToken = crypto.randomBytes(32).toString("hex");
+
+//   user.resetToken = resetToken;
+
+//   user.resetTokenExpire = Date.now() + 15 * 60 * 1000; // 15 mins
+
+//   await user.save();
+
+//   const resetUrl = `${process.env.CLIENT_URL}/reset-password/${resetToken}`;
+
+//   await sendEmail(
+//     user.email,
+//     "Password Reset",
+//     `Click to reset password: ${resetUrl}`
+//   );
+
+//   res.json({ message: "Reset link sent to email" });
+// };
 
 
 export const resetPassword = async (req, res) => {
