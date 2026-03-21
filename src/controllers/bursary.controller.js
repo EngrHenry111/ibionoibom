@@ -13,7 +13,7 @@ import {
 
 import crypto from "crypto";
 import PDFDocument from "pdfkit";
-// import QRCode from "qrcode";
+import QRCode from "qrcode";
 // import path from "path";
 import { sendEmail } from "../utils/sendEmails.js";
 
@@ -353,6 +353,7 @@ export const downloadLetter = async (req, res) => {
 
   const app = await Bursary.findById(req.params.id);
 
+
   const doc = new PDFDocument();
 
   res.setHeader("Content-Type", "application/pdf");
@@ -366,6 +367,25 @@ export const downloadLetter = async (req, res) => {
   doc.text(`Name: ${app.fullName}`);
   doc.text(`Tracking ID: ${app.trackingId}`);
   doc.text(`Status: Approved`);
+
+  // 🔗 Verification link
+const verifyUrl = `https://your-frontend-domain.com/verify/${app.verificationCode}`;
+
+// 🧠 Generate QR as base64
+const qrImage = await QRCode.toDataURL(verifyUrl);
+
+// 📌 Add QR to PDF
+doc.image(qrImage, {
+  fit: [100, 100],
+  align: "center",
+});
+
+doc.moveDown();
+
+doc
+  .fontSize(10)
+  .fillColor("blue")
+  .text("Scan to verify this bursary", { align: "center" });
 
   doc.end();
 };
