@@ -52,7 +52,7 @@ export const registerStudent = async (req, res) => {
 
   } catch (error) {
     console.error("REGISTER ERROR:", error); // 🔥 VERY IMPORTANT
-
+    console.log("REGISTER HIT")
     res.status(500).json({
       message: error.message || "Registration failed",
     });

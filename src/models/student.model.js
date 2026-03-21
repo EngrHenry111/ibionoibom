@@ -38,6 +38,7 @@ studentSchema.pre("save", async function () {
 
     this.password = await bcrypt.hash(this.password, 10);
   } catch (error) {
+    console.log("PRE-SAVE TRIGGERED")
     throw error; // 🔥 important
   }
 });
