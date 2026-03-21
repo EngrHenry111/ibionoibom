@@ -172,20 +172,26 @@ export const forgotPassword = async (req, res) => {
       });
     }
 
-    // 🔐 Generate reset token
+    // 🔐 Generate raw token
     const resetToken = crypto.randomBytes(20).toString("hex");
 
-    user.resetToken = resetToken;
+    // 🔒 Hash token (store hashed, not raw)
+    const hashedToken = crypto
+      .createHash("sha256")
+      .update(resetToken)
+      .digest("hex");
+
+    user.resetToken = hashedToken;
     user.resetTokenExpire = Date.now() + 15 * 60 * 1000; // 15 mins
 
     await user.save();
 
-    // ✅ Instead of email, return link
+    // 🔗 Send RAW token to frontend
     const resetUrl = `http://localhost:5173/bursary/reset-password/${resetToken}`;
 
     res.json({
       message: "Reset link generated",
-      resetUrl, // 🔥 IMPORTANT
+      resetUrl,
     });
 
   } catch (error) {
@@ -196,6 +202,43 @@ export const forgotPassword = async (req, res) => {
     });
   }
 };
+
+// export const forgotPassword = async (req, res) => {
+//   try {
+//     const { email } = req.body;
+
+//     const user = await Student.findOne({ email });
+
+//     if (!user) {
+//       return res.status(404).json({
+//         message: "User not found",
+//       });
+//     }
+
+//     // 🔐 Generate reset token
+//     const resetToken = crypto.randomBytes(20).toString("hex");
+
+//     user.resetToken = resetToken;
+//     user.resetTokenExpire = Date.now() + 15 * 60 * 1000; // 15 mins
+
+//     await user.save();
+
+//     // ✅ Instead of email, return link
+//     const resetUrl = `http://localhost:5173/bursary/reset-password/${resetToken}`;
+
+//     res.json({
+//       message: "Reset link generated",
+//       resetUrl, // 🔥 IMPORTANT
+//     });
+
+//   } catch (error) {
+//     console.error("FORGOT PASSWORD ERROR:", error);
+
+//     res.status(500).json({
+//       message: "Server error",
+//     });
+//   }
+// };
 /* FORGOT PASSWORD */
 
 // export const forgotPassword = async (req, res) => {
@@ -227,21 +270,64 @@ export const forgotPassword = async (req, res) => {
 
 
 export const resetPassword = async (req, res) => {
+  try {
+    const { password } = req.body;
 
-  const user = await Student.findOne({
-    resetToken: req.params.token,
-    resetTokenExpire: { $gt: Date.now() }
-  });
+    // 🔐 Hash incoming token to compare
+    const hashedToken = crypto
+      .createHash("sha256")
+      .update(req.params.token)
+      .digest("hex");
 
-  if (!user) {
-    return res.status(400).json({ message: "Invalid or expired token" });
+    const user = await Student.findOne({
+      resetToken: hashedToken,
+      resetTokenExpire: { $gt: Date.now() }, // ⏳ not expired
+    });
+
+    if (!user) {
+      return res.status(400).json({
+        message: "Invalid or expired token",
+      });
+    }
+
+    // ✅ Set new password
+    user.password = password;
+
+    // ❌ Clear reset fields
+    user.resetToken = undefined;
+    user.resetTokenExpire = undefined;
+
+    await user.save();
+
+    res.json({
+      message: "Password reset successful",
+    });
+
+  } catch (error) {
+    console.error("RESET PASSWORD ERROR:", error);
+
+    res.status(500).json({
+      message: "Reset failed",
+    });
   }
-
-  user.password = req.body.password;
-  user.resetToken = undefined;
-  user.resetTokenExpire = undefined;
-
-  await user.save();
-
-  res.json({ message: "Password reset successful" });
 };
+
+// export const resetPassword = async (req, res) => {
+
+//   const user = await Student.findOne({
+//     resetToken: req.params.token,
+//     resetTokenExpire: { $gt: Date.now() }
+//   });
+
+//   if (!user) {
+//     return res.status(400).json({ message: "Invalid or expired token" });
+//   }
+
+//   user.password = req.body.password;
+//   user.resetToken = undefined;
+//   user.resetTokenExpire = undefined;
+
+//   await user.save();
+
+//   res.json({ message: "Password reset successful" });
+// };
