@@ -60,4 +60,21 @@ app.use("/api/archive", archiveRoutes);
 app.use("/api/bursary", bursaryRoutes);
 app.use("/api/students", studentRoutes);
 
+
+// 🔥 GLOBAL ERROR HANDLER (VERY IMPORTANT)
+app.use((err, req, res, next) => {
+  console.error("GLOBAL ERROR:", err.message);
+
+  // Multer errors
+  if (err.message.includes("File")) {
+    return res.status(400).json({
+      message: err.message,
+    });
+  }
+
+  return res.status(500).json({
+    message: "Server error",
+  });
+});
+
 export default app;

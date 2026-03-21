@@ -15,17 +15,33 @@ import { uploadBursaryDocuments } from "../middlewares/upload.middleware.js";
 const router = express.Router();
 
 /* ================= APPLY ================= */
-router.post(
-  "/apply",
-  protectStudent,
+
+router.post("/apply", protectStudent, (req, res, next) => {
   uploadBursaryDocuments.fields([
     { name: "passport", maxCount: 1 },
     { name: "admissionLetter", maxCount: 1 },
     { name: "studentID", maxCount: 1 },
     { name: "lgaCertificate", maxCount: 1 },
-  ]),
-  applyBursary
-);
+  ])(req, res, function (err) {
+    if (err) {
+      console.error("UPLOAD ERROR:", err.message);
+      return res.status(400).json({ message: err.message });
+    }
+
+    next();
+  });
+}, applyBursary);
+// router.post(
+//   "/apply",
+//   protectStudent,
+//   uploadBursaryDocuments.fields([
+//     { name: "passport", maxCount: 1 },
+//     { name: "admissionLetter", maxCount: 1 },
+//     { name: "studentID", maxCount: 1 },
+//     { name: "lgaCertificate", maxCount: 1 },
+//   ]),
+//   applyBursary
+// );
 
 /* ================= STUDENT ================= */
 router.get("/my", protectStudent, getMyApplications);
