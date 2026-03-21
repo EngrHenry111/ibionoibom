@@ -2,6 +2,7 @@ import Student from "../models/student.model.js";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
 
+
 /* ================= TOKEN ================= */
 const generateToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, {
@@ -14,31 +15,43 @@ export const registerStudent = async (req, res) => {
   try {
     const { fullName, email, password } = req.body;
 
+    /* ================= VALIDATION ================= */
+    if (!fullName || !email || !password) {
+      return res.status(400).json({
+        message: "All fields are required",
+      });
+    }
+
+    /* ================= CHECK EXISTING ================= */
     const existing = await Student.findOne({ email });
 
     if (existing) {
       return res.status(400).json({
-        message: "Student already exists",
+        message: "Email already registered",
       });
     }
 
-    const hashedPassword = await bcrypt.hash(password, 10);
-
+    /* ================= CREATE USER ================= */
     const student = await Student.create({
       fullName,
       email,
-      password: hashedPassword,
+      password, // ✅ DO NOT HASH HERE
     });
 
+    /* ================= RESPONSE ================= */
     res.status(201).json({
       _id: student._id,
       fullName: student.fullName,
       email: student.email,
       token: generateToken(student._id),
     });
+
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Registration failed" });
+    console.error("REGISTER ERROR:", error);
+
+    res.status(500).json({
+      message: "Registration failed",
+    });
   }
 };
 
@@ -51,15 +64,15 @@ export const loginStudent = async (req, res) => {
 
     if (!student) {
       return res.status(400).json({
-        message: "Invalid credentials",
+        message: "Invalid email or password",
       });
     }
 
-    const isMatch = await bcrypt.compare(password, student.password);
+    const isMatch = await student.matchPassword(password);
 
     if (!isMatch) {
       return res.status(400).json({
-        message: "Invalid credentials",
+        message: "Invalid email or password",
       });
     }
 
@@ -69,10 +82,16 @@ export const loginStudent = async (req, res) => {
       email: student.email,
       token: generateToken(student._id),
     });
+
   } catch (error) {
-    res.status(500).json({ message: "Login failed" });
+    console.error("LOGIN ERROR:", error);
+
+    res.status(500).json({
+      message: "Login failed",
+    });
   }
 };
+
 
 /* ================= PROFILE ================= */
 export const getProfile = async (req, res) => {
