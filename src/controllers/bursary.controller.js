@@ -150,6 +150,9 @@ if (isFraud) {
       trackingId,
       verificationCode,
 
+      verificationStatus,
+      fraudFlag: isFraud,
+
       user: req.user?._id,
 
       // ✅ FIXED
