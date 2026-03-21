@@ -1,6 +1,6 @@
 import Student from "../models/student.model.js";
 import jwt from "jsonwebtoken";
-import bcrypt from "bcryptjs";
+// import bcrypt from "bcryptjs";
 
 
 /* ================= TOKEN ================= */
@@ -15,14 +15,14 @@ export const registerStudent = async (req, res) => {
   try {
     const { fullName, email, password } = req.body;
 
-    /* ================= VALIDATION ================= */
+    console.log("BODY:", req.body); // 🔥 debug
+
     if (!fullName || !email || !password) {
       return res.status(400).json({
         message: "All fields are required",
       });
     }
 
-    /* ================= CHECK EXISTING ================= */
     const existing = await Student.findOne({ email });
 
     if (existing) {
@@ -31,26 +31,30 @@ export const registerStudent = async (req, res) => {
       });
     }
 
-    /* ================= CREATE USER ================= */
     const student = await Student.create({
       fullName,
       email,
-      password, // ✅ DO NOT HASH HERE
+      password, // hashed by model
     });
 
-    /* ================= RESPONSE ================= */
+    const token = jwt.sign(
+      { id: student._id },
+      process.env.JWT_SECRET || "fallback_secret",
+      { expiresIn: "7d" }
+    );
+
     res.status(201).json({
       _id: student._id,
       fullName: student.fullName,
       email: student.email,
-      token: generateToken(student._id),
+      token,
     });
 
   } catch (error) {
-    console.error("REGISTER ERROR:", error);
+    console.error("REGISTER ERROR:", error); // 🔥 VERY IMPORTANT
 
     res.status(500).json({
-      message: "Registration failed",
+      message: error.message || "Registration failed",
     });
   }
 };
