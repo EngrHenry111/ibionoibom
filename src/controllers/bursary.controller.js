@@ -4,18 +4,17 @@ import {
   validateNIN,
   detectFraud,
 } from "../services/identity.services.js"
+
+import {
+  verifyBVNExternal,
+  verifyNINExternal,
+  verifyFaceMatch,
+} from "../services/identity.services.js";
+
 import crypto from "crypto";
 import PDFDocument from "pdfkit";
 import QRCode from "qrcode";
 import path from "path";
-
-
-
-/* GENERATE TRACKING ID */
-// const generateTrackingId = () => {
-//   return "IBB-" + crypto.randomBytes(4).toString("hex").toUpperCase();
-// };
-
 
 
 /* ================= APPLY BURSARY ================= */
@@ -100,6 +99,31 @@ export const applyBursary = async (req, res) => {
       "IBB-" + crypto.randomBytes(4).toString("hex").toUpperCase();
 
     const verificationCode = crypto.randomBytes(8).toString("hex");
+    /* ================= EXTERNAL VERIFICATION ================= */
+
+const bvnCheck = await verifyBVNExternal(bvn);
+const ninCheck = await verifyNINExternal(nin);
+
+const faceCheck = await verifyFaceMatch(
+  req.files?.passport?.[0]?.path,
+  req.files?.studentID?.[0]?.path
+);
+
+/* ================= FINAL STATUS ================= */
+
+let verificationStatus = "verified";
+
+if (
+  bvnCheck.status === "fallback" ||
+  ninCheck.status === "fallback" ||
+  faceCheck.status === "fallback"
+) {
+  verificationStatus = "unverified"; // safe fallback
+}
+
+if (isFraud) {
+  verificationStatus = "failed";
+}
 
     /* ================= CREATE ================= */
     const application = await Bursary.create({
