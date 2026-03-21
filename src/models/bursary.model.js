@@ -46,9 +46,7 @@ const bursarySchema = new mongoose.Schema(
   
   verificationCode: {
     type: String,
-    enum:["unverified", "verified", "failed"],
-    required: false,
-    default: "unverified",
+    unique: true
   }, 
 
   fraudFlag: {
