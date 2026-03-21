@@ -15,6 +15,7 @@ import crypto from "crypto";
 import PDFDocument from "pdfkit";
 import QRCode from "qrcode";
 import path from "path";
+import { sendEmail } from "../utils/sendEmails.js";
 
 
 /* ================= APPLY BURSARY ================= */
@@ -332,22 +333,30 @@ export const getAllApplications = async (req, res) => {
 };
 
 
-export const updateApplicationStatus = async (req, res) => {
 
+export const updateApplicationStatus = async (req, res) => {
   try {
+    const { status } = req.body;
 
     const app = await Bursary.findById(req.params.id);
 
-    app.status = req.body.status;
-
+    app.status = status;
     await app.save();
 
-    res.json(app);
+    // 🔥 SEND EMAIL
+    await sendEmail(
+      app.email,
+      "Bursary Application Update",
+      `<h3>Hello ${app.fullName}</h3>
+       <p>Your application has been <strong>${status}</strong>.</p>`
+    );
+
+    res.json({ message: "Updated successfully" });
 
   } catch (error) {
-    res.status(500).json({ message: "Failed" });
+    console.error(error);
+    res.status(500).json({ message: "Update failed" });
   }
-
 };
 
 export const downloadLetter = async (req, res) => {
