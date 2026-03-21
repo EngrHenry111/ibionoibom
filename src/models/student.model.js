@@ -52,7 +52,7 @@ studentSchema.pre("save", async function (next) {
 
 //   next();
 
-});
+// });
 
 /* MATCH PASSWORD */
 studentSchema.methods.matchPassword = async function(password){
