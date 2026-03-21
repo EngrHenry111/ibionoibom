@@ -72,3 +72,19 @@ export const verifyFaceMatch = async (passport, studentID) => {
     };
   }
 };
+
+
+/* ================= FRAUD DETECTION ================= */
+
+export const detectFraud = async (Bursary, { email, bvn, nin }) => {
+  try {
+    const existing = await Bursary.findOne({
+      $or: [{ email }, { bvn }, { nin }],
+    });
+
+    return !!existing; // true = fraud, false = safe
+  } catch (error) {
+    console.error("Fraud detection error:", error);
+    return false; // 🔥 never break system
+  }
+};
