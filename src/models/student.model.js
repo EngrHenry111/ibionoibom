@@ -32,15 +32,13 @@ const studentSchema = new mongoose.Schema({
 
 /* HASH PASSWORD */
 
-studentSchema.pre("save", async function (next) {
+studentSchema.pre("save", async function () {
   try {
-    if (!this.isModified("password")) return next();
+    if (!this.isModified("password")) return;
 
     this.password = await bcrypt.hash(this.password, 10);
-
-    next(); // ✅ must be called properly
   } catch (error) {
-    next(error); // ✅ VERY IMPORTANT FIX
+    throw error; // 🔥 important
   }
 });
 

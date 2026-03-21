@@ -11,7 +11,7 @@ export const protectStudent = async (req, res, next) => {
 
     if (!token) {
       return res.status(401).json({
-        message: "No token, authorization denied",
+        message: "No token",
       });
     }
 
@@ -19,17 +19,9 @@ export const protectStudent = async (req, res, next) => {
 
     req.user = await Student.findById(decoded.id).select("-password");
 
-    if (!req.user) {
-      return res.status(401).json({
-        message: "User not found",
-      });
-    }
-
-    next(); // ✅ SAFE HERE
+    next(); // ✅ ONLY HERE
 
   } catch (error) {
-    console.error("AUTH ERROR:", error);
-
     return res.status(401).json({
       message: "Not authorized",
     });
