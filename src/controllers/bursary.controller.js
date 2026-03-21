@@ -209,96 +209,51 @@ export const generateLetter = async (req, res) => {
   try {
     const app = await Bursary.findById(req.params.id);
 
-    if (!app || app.status !== "approved") {
-      return res.status(400).json({
-        message: "Application not approved",
-      });
+    // ❗ CHECK IF FOUND
+    if (!app) {
+      return res.status(404).send("Application not found");
     }
 
-    const verificationUrl = `https://ibionoibomlga.vercel.app/verify/${app.verificationCode}`;
+    // ❗ ONLY APPROVED CAN DOWNLOAD
+    if (app.status !== "approved") {
+      return res.status(400).send("Only approved applications can download letter");
+    }
 
-    const qrImage = await QRCode.toDataURL(verificationUrl);
+    res.setHeader("Content-Type", "text/html");
 
-    const doc = new PDFDocument({ margin: 50 });
+    res.send(`
+      <html>
+        <head>
+          <title>Bursary Approval Letter</title>
+        </head>
+        <body style="font-family: Arial; padding: 20px;">
+          <h1>Ibiono Ibom LGA</h1>
+          <h2>Bursary Approval Letter</h2>
 
-    res.setHeader("Content-Type", "application/pdf");
-    res.setHeader(
-      "Content-Disposition",
-      `attachment; filename=${app.fullName}-bursary.pdf`
-    );
+          <p>Dear <strong>${app.fullName}</strong>,</p>
 
-    doc.pipe(res);
+          <p>
+            We are pleased to inform you that your bursary application
+            has been <strong>approved</strong>.
+          </p>
 
-    /* ================= LOGO ================= */
-    const logoPath = path.join("uploads/assets/logo.png");
+          <p><strong>Tracking ID:</strong> ${app.trackingId}</p>
+          <p><strong>Institution:</strong> ${app.institution}</p>
 
-    doc.image(logoPath, 250, 30, { width: 80 });
+          <br/>
 
-    doc.moveDown(3);
+          <p>Congratulations 🎉</p>
 
-    /* ================= HEADER ================= */
-    doc
-      .fontSize(18)
-      .text("IBIONO IBOM LOCAL GOVERNMENT AREA", {
-        align: "center",
-      });
+          <p>Signed,</p>
+          <p>Ibiono Ibom Local Government</p>
+        </body>
+      </html>
+    `);
 
-    doc.fontSize(14).text("BURSARY APPROVAL CERTIFICATE", {
-      align: "center",
-    });
-
-    doc.moveDown(2);
-
-    /* ================= BODY ================= */
-    doc.fontSize(12);
-
-    doc.text(`Date: ${new Date().toLocaleDateString()}`);
-    doc.moveDown();
-
-    doc.text(`This is to certify that:`);
-
-    doc.moveDown();
-
-    doc.fontSize(16).text(app.fullName, { align: "center" });
-
-    doc.moveDown();
-
-    doc.fontSize(12).text(
-      `has been approved for bursary support under Ibiono Ibom LGA.`
-    );
-
-    doc.moveDown();
-
-    doc.text(`Institution: ${app.institution}`);
-    doc.text(`Account Number: ${app.accountNumber}`);
-    doc.text(`Bank: ${app.bankName}`);
-    doc.text(`Tracking ID: ${app.trackingId}`);
-
-    doc.moveDown(2);
-
-    doc.text("This certificate is valid and verifiable online.");
-
-    doc.moveDown(2);
-
-    /* ================= QR CODE ================= */
-    doc.image(qrImage, 220, doc.y, { width: 100 });
-
-    doc.moveDown(4);
-
-    doc.text("Scan QR code to verify authenticity", {
-      align: "center",
-    });
-
-    doc.moveDown(3);
-
-    /* ================= SIGNATURE ================= */
-    doc.text("__________________________", { align: "left" });
-    doc.text("Executive Chairman", { align: "left" });
-
-    doc.end();
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Failed to generate certificate" });
+    console.error("LETTER ERROR:", error);
+
+    res.status(500).send("Server error generating letter");
   }
 };
 
