@@ -10,9 +10,35 @@ router.get("/", async (req, res) => {
 });
 
 router.post("/", protect, async (req, res) => {
-  const created = await Tourism.create(req.body);
-  res.json(created);
+  try {
+    console.log("BODY:", req.body); // 🔥 DEBUG
+
+    const { name, location, type, description } = req.body;
+
+    if (!name || !location || !type || !description) {
+      return res.status(400).json({
+        message: "All fields are required",
+      });
+    }
+
+    const created = await Tourism.create({
+      name,
+      location,
+      type,
+      description
+    });
+
+    res.json(created);
+
+  } catch (error) {
+    console.error("TOURISM CREATE ERROR:", error); // 🔥 VERY IMPORTANT
+
+    res.status(500).json({
+      message: "Server error while creating tourism data",
+    });
+  }
 });
+
 
 router.put("/:id", protect, async (req, res) => {
   const updated = await Tourism.findByIdAndUpdate(
