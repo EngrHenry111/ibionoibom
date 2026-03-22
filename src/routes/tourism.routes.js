@@ -4,22 +4,30 @@ import { protect } from "../middlewares/auth.middleware.js";
 
 const router = express.Router();
 
+
+// ================= GET ALL =================
 router.get("/", async (req, res) => {
-  const data = await Tourism.find().sort({ createdAt: -1 });
-  res.json(data);
+  try {
+    const data = await Tourism.find().sort({ createdAt: -1 });
+    res.json(data);
+  } catch (error) {
+    console.error("GET ERROR:", error);
+    res.status(500).json({ message: error.message });
+  }
 });
 
-router.post("/", async (req, res) => {
+
+// ================= CREATE =================
+router.post("/", protect, async (req, res) => {
   try {
-    console.log("REQ BODY:", req.body);
+    console.log("BODY:", req.body); // 🔥 debug
 
     const { name, location, type, description } = req.body;
 
-    // HARD CHECK
+    // validation
     if (!name || !location || !type || !description) {
       return res.status(400).json({
-        message: "Missing fields",
-        body: req.body
+        message: "All fields are required"
       });
     }
 
@@ -33,27 +41,52 @@ router.post("/", async (req, res) => {
     res.status(201).json(created);
 
   } catch (error) {
-    console.error("FULL ERROR:", error);
+    console.error("CREATE ERROR:", error);
 
     res.status(500).json({
-      message: error.message,
-      stack: error.stack
+      message: error.message
     });
   }
 });
 
+
+// ================= UPDATE =================
 router.put("/:id", protect, async (req, res) => {
-  const updated = await Tourism.findByIdAndUpdate(
-    req.params.id,
-    req.body,
-    { new: true }
-  );
-  res.json(updated);
+  try {
+    const updated = await Tourism.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      { new: true }
+    );
+
+    if (!updated) {
+      return res.status(404).json({ message: "Not found" });
+    }
+
+    res.json(updated);
+
+  } catch (error) {
+    console.error("UPDATE ERROR:", error);
+    res.status(500).json({ message: error.message });
+  }
 });
 
+
+// ================= DELETE =================
 router.delete("/:id", protect, async (req, res) => {
-  await Tourism.findByIdAndDelete(req.params.id);
-  res.json({ message: "Deleted" });
+  try {
+    const deleted = await Tourism.findByIdAndDelete(req.params.id);
+
+    if (!deleted) {
+      return res.status(404).json({ message: "Not found" });
+    }
+
+    res.json({ message: "Deleted successfully" });
+
+  } catch (error) {
+    console.error("DELETE ERROR:", error);
+    res.status(500).json({ message: error.message });
+  }
 });
 
 export default router;
