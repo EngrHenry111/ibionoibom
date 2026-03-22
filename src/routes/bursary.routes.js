@@ -7,6 +7,7 @@ import {
   generateLetter,
   verifyBursary,
   getBursaryStats,
+  verifyByTrackingId,
 } from "../controllers/bursary.controller.js";
 
 import { protectStudent } from "../middlewares/studentAuth.middleware.js";
@@ -54,7 +55,7 @@ router.patch("/:id/status", protect, updateApplicationStatus);
 /* ================= PUBLIC ================= */
 router.get("/letter/:id", generateLetter);
 router.get("/verify/:code", verifyBursary);
-// router.get("/verify-tracking/:trackingId", verifyByTrackingId)
+router.get("/verify-tracking/:trackingId", verifyByTrackingId)
 router.get("/stats", protect, getBursaryStats)
 
 export default router;

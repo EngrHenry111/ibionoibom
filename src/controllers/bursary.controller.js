@@ -323,36 +323,41 @@ export const getAllApplications = async (req, res) => {
 };
 
 
-
 export const updateApplicationStatus = async (req, res) => {
   try {
     const { status } = req.body;
 
     const app = await Bursary.findById(req.params.id);
 
+    if (!app) {
+      return res.status(404).json({ message: "Application not found" });
+    }
+
+    // ✅ UPDATE FIRST
     app.status = status;
     await app.save();
 
-    // 🔥 SEND EMAIL
-    await sendEmail(
-      app.email,
-      "Bursary Application Update",
-      `<h3>Hello ${app.fullName}</h3>
-       <p>Your application has been <strong>${status}</strong>.</p>`
-    );
+    // 🔥 SEND RESPONSE FIRST (VERY IMPORTANT)
+    res.json({ message: "Status updated successfully" });
 
-    res.json({ message: "Updated successfully" });
+    // 🔥 THEN RUN EMAIL (NON-BLOCKING)
+    try {
+      // OPTIONAL EMAIL
+      // await sendEmail(...);
+    } catch (emailError) {
+      console.error("EMAIL ERROR:", emailError.message);
+    }
 
   } catch (error) {
-    console.error(error);
+    console.error("UPDATE ERROR:", error);
     res.status(500).json({ message: "Update failed" });
   }
 };
 
+
 export const downloadLetter = async (req, res) => {
 
   const app = await Bursary.findById(req.params.id);
-
 
   const doc = new PDFDocument();
 
@@ -447,13 +452,28 @@ export const getBursaryStats = async (req, res) => {
 
 
 export const verifyByTrackingId = async (req, res) => {
-  const app = await Bursary.findOne({
-    trackingId: req.params.trackingId,
-  });
+  try {
+    const app = await Bursary.findOne({
+      trackingId: req.params.trackingId,
+    });
 
-  if (!app) {
-    return res.status(404).json({ message: "Not found" });
+    if (!app) {
+      return res.status(404).json({
+        message: "Tracking ID not found",
+      });
+    }
+
+    res.json({
+      fullName: app.fullName,
+      institution: app.institution,
+      status: app.status,
+      trackingId: app.trackingId,
+    });
+
+  } catch (error) {
+    console.error("VERIFY TRACKING ERROR:", error);
+    res.status(500).json({
+      message: "Verification failed",
+    });
   }
-
-  res.json(app);
 };
