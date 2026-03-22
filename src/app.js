@@ -14,6 +14,8 @@ import archiveRoutes from "./routes/archive.routes.js"
 import bursaryRoutes from "./routes/bursary.routes.js";
 import studentRoutes from "./routes/student.routes.js"
 
+import schoolRoutes from "./routes/school.routes.js"
+
 const app = express();
 app.use(cors());
 app.use(express.json());
@@ -59,6 +61,10 @@ app.use("/api/archive", archiveRoutes);
 
 app.use("/api/bursary", bursaryRoutes);
 app.use("/api/students", studentRoutes);
+
+app.use("/api/schools",  schoolRoutes)
+
+
 
 
 process.on("uncaughtException", (err) => {
