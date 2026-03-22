@@ -453,9 +453,11 @@ export const getBursaryStats = async (req, res) => {
 
 export const verifyByTrackingId = async (req, res) => {
   try {
-    const app = await Bursary.findOne({
-      trackingId: req.params.trackingId,
-    });
+    const { trackingId } = req.params;
+
+    console.log("TRACKING RECEIVED:", trackingId); // 🔥 DEBUG
+
+    const app = await Bursary.findOne({ trackingId });
 
     if (!app) {
       return res.status(404).json({
