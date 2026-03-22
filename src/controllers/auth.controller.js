@@ -98,6 +98,7 @@ export const loginAdmin = async (req, res) => {
         role: admin.role,
       },
     });
+    
   } catch (error) {
     console.error("LOGIN ERROR:", error);
     res.status(500).json({ message: "Server error" });
