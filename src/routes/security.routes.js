@@ -1,21 +1,21 @@
 import express from "express";
-import Health from "../models/health.model.js";
+import Security from "../models/security.model.js";
 import { protect } from "../middlewares/auth.middleware.js";
 
 const router = express.Router();
 
 router.get("/", async (req, res) => {
-  const data = await Health.find().sort({ createdAt: -1 });
+  const data = await Security.find().sort({ createdAt: -1 });
   res.json(data);
 });
 
 router.post("/", protect, async (req, res) => {
-  const created = await Health.create(req.body);
+  const created = await Security.create(req.body);
   res.json(created);
 });
 
 router.put("/:id", protect, async (req, res) => {
-  const updated = await Health.findByIdAndUpdate(
+  const updated = await Security.findByIdAndUpdate(
     req.params.id,
     req.body,
     { new: true }
@@ -23,9 +23,8 @@ router.put("/:id", protect, async (req, res) => {
   res.json(updated);
 });
 
-
 router.delete("/:id", protect, async (req, res) => {
-  await Health.findByIdAndDelete(req.params.id);
+  await Security.findByIdAndDelete(req.params.id);
   res.json({ message: "Deleted" });
 });
 

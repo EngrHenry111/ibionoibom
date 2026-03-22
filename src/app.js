@@ -18,6 +18,8 @@ import schoolRoutes from "./routes/school.routes.js"
 
 import healthRoutes from "./routes/health.routes.js"
 
+import securityRoutes from "./routes/security.routes.js"
+
 const app = express();
 app.use(cors());
 app.use(express.json());
@@ -64,6 +66,7 @@ app.use("/api/schools",  schoolRoutes)
 
 app.use("/api/health", healthRoutes);
 
+app.use("/api/security", securityRoutes)
 
 process.on("uncaughtException", (err) => {
   console.error("UNCAUGHT ERROR:", err);
