@@ -22,6 +22,8 @@ import securityRoutes from "./routes/security.routes.js"
 
 import agricultureRoutes from "./routes/agriculture.Routes.js"
 
+import tourismRoutes from "./routes/tenure.routes.js"
+
 const app = express();
 app.use(cors());
 app.use(express.json());
@@ -71,6 +73,8 @@ app.use("/api/health", healthRoutes);
 app.use("/api/security", securityRoutes);
 
 app.use("/api/agriculture", agricultureRoutes)
+
+app.use("/api/tourism", tourismRoutes)
 
 process.on("uncaughtException", (err) => {
   console.error("UNCAUGHT ERROR:", err);
