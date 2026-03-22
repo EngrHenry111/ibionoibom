@@ -444,3 +444,16 @@ export const getBursaryStats = async (req, res) => {
     });
   }
 };
+
+
+export const verifyByTrackingId = async (req, res) => {
+  const app = await Bursary.findOne({
+    trackingId: req.params.trackingId,
+  });
+
+  if (!app) {
+    return res.status(404).json({ message: "Not found" });
+  }
+
+  res.json(app);
+};
