@@ -9,15 +9,17 @@ router.get("/", async (req, res) => {
   res.json(data);
 });
 
-router.post("/", protect, async (req, res) => {
+router.post("/", async (req, res) => {
   try {
-    console.log("BODY:", req.body); // 🔥 DEBUG
+    console.log("REQ BODY:", req.body);
 
     const { name, location, type, description } = req.body;
 
+    // HARD CHECK
     if (!name || !location || !type || !description) {
       return res.status(400).json({
-        message: "All fields are required",
+        message: "Missing fields",
+        body: req.body
       });
     }
 
@@ -28,17 +30,17 @@ router.post("/", protect, async (req, res) => {
       description
     });
 
-    res.json(created);
+    res.status(201).json(created);
 
   } catch (error) {
-    console.error("TOURISM CREATE ERROR:", error); // 🔥 VERY IMPORTANT
+    console.error("FULL ERROR:", error);
 
     res.status(500).json({
-      message: "Server error while creating tourism data",
+      message: error.message,
+      stack: error.stack
     });
   }
 });
-
 
 router.put("/:id", protect, async (req, res) => {
   const updated = await Tourism.findByIdAndUpdate(
