@@ -98,20 +98,20 @@ export const uploadNewsImages = multer({
 const bursaryStorage = new CloudinaryStorage({
   cloudinary,
   params: async (req, file) => {
-  let folder = "ibiono/bursary/others";
+    let folder = "ibiono/bursary/others";
 
-  if (file.fieldname === "passport") {
-    folder = "ibiono/bursary/passport";
-  } else if (file.fieldname === "admissionLetter") {
-    folder = "ibiono/bursary/admission";
-  } else if (file.fieldname === "studentID") {
-    folder = "ibiono/bursary/id";
-  } else if (file.fieldname === "lgaCertificate") {
-    folder = "ibiono/bursary/lga";
-  }
+    // 📂 Dynamic folder structure
+    if (file.fieldname === "passport") {
+      folder = "ibiono/bursary/passport";
+    } else if (file.fieldname === "admissionLetter") {
+      folder = "ibiono/bursary/admission";
+    } else if (file.fieldname === "studentID") {
+      folder = "ibiono/bursary/id";
+    } else if (file.fieldname === "lgaCertificate") {
+      folder = "ibiono/bursary/lga";
+    }
 
-  // ✅ FIX STARTS HERE
-  const isPDF = file.mimetype === "application/pdf";
+    const isPDF = file.mimetype === "application/pdf";
 
   return {
     folder,
@@ -120,8 +120,8 @@ const bursaryStorage = new CloudinaryStorage({
       ? ["pdf"]
       : ["jpg", "jpeg", "png", "webp"],
   };
-}
-});
+    },
+  });
 
 /* ===============================
    EXPORT BURSARY UPLOADER
