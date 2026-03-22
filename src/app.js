@@ -16,6 +16,8 @@ import studentRoutes from "./routes/student.routes.js"
 
 import schoolRoutes from "./routes/school.routes.js"
 
+import healthRoutes from "./routes/health.routes.js"
+
 const app = express();
 app.use(cors());
 app.use(express.json());
@@ -45,10 +47,6 @@ app.use(rateLimit({
 }));
 
 
-// app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
-// app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
-
-// app.use("/uploads", express.static(path.resolve("uploads")));
 
 app.use("/api/admin", authRoutes);
 app.use("/api/leaders", leaderRoutes);
@@ -64,7 +62,7 @@ app.use("/api/students", studentRoutes);
 
 app.use("/api/schools",  schoolRoutes)
 
-
+app.use("/api/health", healthRoutes);
 
 
 process.on("uncaughtException", (err) => {
