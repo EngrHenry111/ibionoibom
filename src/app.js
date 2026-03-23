@@ -28,6 +28,8 @@ import economicRoutes from "./routes/ecnomic.routes.js"
 
 import cultureRoutes from "./routes/culture.routes.js"
 
+import historyRoutes from "./routes/history.routes.js"
+
 const app = express();
 app.use(cors());
 app.use(express.json());
@@ -80,9 +82,11 @@ app.use("/api/agriculture", agricultureRoutes)
 
 app.use("/api/tourism", tourismRoutes);
 
-app.use("/api/economic", economicRoutes)
+app.use("/api/economic", economicRoutes);
 
-app.use("/api/culture", cultureRoutes)
+app.use("/api/culture", cultureRoutes);
+
+app.use("/api/history", historyRoutes);
 
 process.on("uncaughtException", (err) => {
   console.error("UNCAUGHT ERROR:", err);
