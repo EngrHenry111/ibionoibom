@@ -30,6 +30,8 @@ import cultureRoutes from "./routes/culture.routes.js"
 
 import historyRoutes from "./routes/history.routes.js"
 
+import diosporaRoutes from "./routes/dashboard.routes.js"
+
 const app = express();
 app.use(cors());
 app.use(express.json());
@@ -87,6 +89,8 @@ app.use("/api/economic", economicRoutes);
 app.use("/api/culture", cultureRoutes);
 
 app.use("/api/history", historyRoutes);
+
+app.use("/api/diospora", diosporaRoutes);
 
 process.on("uncaughtException", (err) => {
   console.error("UNCAUGHT ERROR:", err);
