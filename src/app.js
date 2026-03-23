@@ -90,7 +90,7 @@ app.use("/api/culture", cultureRoutes);
 
 app.use("/api/history", historyRoutes);
 
-app.use("/api/diospora", diosporaRoutes);
+app.use("/api/diaspora", diosporaRoutes);
 
 process.on("uncaughtException", (err) => {
   console.error("UNCAUGHT ERROR:", err);
