@@ -1,5 +1,5 @@
 import express from "express";
-import Diaspora from "../models/diospora.model.js";
+import Diaspora from "../models/diaspora.model.js";
 import { protect } from "../middlewares/auth.middleware.js";
 
 const router = express.Router();

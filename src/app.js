@@ -30,7 +30,7 @@ import cultureRoutes from "./routes/culture.routes.js"
 
 import historyRoutes from "./routes/history.routes.js"
 
-import diosporaRoutes from "./routes/dashboard.routes.js"
+import diasporaRoutes from "./routes/dashboard.routes.js"
 
 const app = express();
 app.use(cors());
@@ -90,7 +90,7 @@ app.use("/api/culture", cultureRoutes);
 
 app.use("/api/history", historyRoutes);
 
-app.use("/api/diaspora", diosporaRoutes);
+app.use("/api/diaspora", diasporaRoutes);
 
 process.on("uncaughtException", (err) => {
   console.error("UNCAUGHT ERROR:", err);
