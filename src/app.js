@@ -30,7 +30,7 @@ import cultureRoutes from "./routes/culture.routes.js"
 
 import historyRoutes from "./routes/history.routes.js"
 
-import diasporaRoutes from "./routes/dashboard.routes.js"
+import diasporaRoutes from "./routes/diaspora.routes.js"
 
 const app = express();
 app.use(cors());
