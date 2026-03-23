@@ -1,6 +1,7 @@
 import express from "express";
 import Diaspora from "../models/diaspora.model.js";
 import { protect } from "../middlewares/auth.middleware.js";
+import { sendEmail } from "../utils/sendEmails.js";
 
 const router = express.Router();
 
@@ -8,20 +9,26 @@ const router = express.Router();
 // ================= CREATE =================
 router.post("/", async (req, res) => {
   try {
-
     const created = await Diaspora.create(req.body);
 
-    res.status(201).json({
-      message: "Registration successful",
-      data: created
+    // 📩 EMAIL TO ADMIN
+    await sendEmail({
+      to: process.env.EMAIL_USER,
+      subject: "New Diaspora Registration",
+      text: `${created.name} from ${created.country} just registered.`,
     });
+
+    // 📩 EMAIL TO USER
+    await sendEmail({
+      to: created.email,
+      subject: "Welcome to Diaspora Network",
+      text: `Hello ${created.name}, thank you for joining the diaspora network.`,
+    });
+
+    res.json({ message: "Registration successful" });
 
   } catch (error) {
-    console.error("DIASPORA ERROR:", error);
-
-    res.status(500).json({
-      message: error.message
-    });
+    res.status(500).json({ message: error.message });
   }
 });
 
