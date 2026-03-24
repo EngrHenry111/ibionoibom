@@ -34,6 +34,8 @@ import diasporaRoutes from "./routes/diaspora.routes.js"
 
 import bmtRoutes from "./routes/bmt.routes.js"
 
+import sitemapRoutes from "./routes/sitemap.routes.js"
+
 const app = express();
 app.use(cors());
 app.use(express.json());
@@ -95,6 +97,8 @@ app.use("/api/history", historyRoutes);
 app.use("/api/diaspora", diasporaRoutes);
 
 app.use("/api/bmt", bmtRoutes);
+
+app.use("/", sitemapRoutes);
 
 process.on("uncaughtException", (err) => {
   console.error("UNCAUGHT ERROR:", err);
