@@ -46,7 +46,7 @@ app.use(
   cors({
     origin: [
       "http://localhost:5173",
-      "https://ibionoibomlga.vercel.app"
+      "https://ibionoibomlga.com"
     ],
     credentials: true
   })

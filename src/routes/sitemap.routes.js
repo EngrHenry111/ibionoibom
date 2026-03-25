@@ -10,7 +10,7 @@ router.get("/sitemap.xml", async (req, res) => {
   try {
 
     const smStream = new SitemapStream({
-      hostname: "https://ibionoibom-2.onrender.com"
+      hostname: "https://ibionoibomlga.com"
     });
 
     /* ================= STATIC PAGES ================= */

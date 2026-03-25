@@ -1,8 +1,8 @@
 import News from "../models/News.js";
 import Leader from "../models/Leader.js";
 import Department from "../models/Department.js";
-import { sendEmail } from "../utils/sendEmails.js";
-import app from "../app.js";
+// import { sendEmail } from "../utils/sendEmails.js";
+// import app from "../app.js";
 
 export const getDashboardStats = async (req, res) => {
   try {

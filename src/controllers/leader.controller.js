@@ -4,24 +4,6 @@ import mongoose from "mongoose";
 /* ===============================
    CREATE LEADER
 // ================================ */
-// export const createLeader = async (req, res) => {
-//   try {
-//     const leader = new Leader({
-//       fullName: req.body.fullName,
-//       position: req.body.position,
-//       bio: req.body.bio,
-//       tenure: req.body.tenure,
-//       status: req.body.status || "draft",
-//       imageUrl: req.file ? req.file.path : "",
-//     });
-
-//     await leader.save();
-//     res.status(201).json(leader);
-//   } catch (error) {
-//     console.error(error);
-//     res.status(500).json({ message: "Failed to create leader" });
-//   }
-// };
 
 export const createLeader = async (req, res) => {
   try {
@@ -64,35 +46,6 @@ export const createLeader = async (req, res) => {
 
   }
 };
-// export const createLeader = async (req, res) => {
-//   try {
-//     const { fullName, position, bio, tenure, status } = req.body;
-
-//     if (!fullName || !position || !tenure) {
-//       return res.status(400).json({
-//         message: "Full name, position and tenure are required",
-//       });
-//     }
-
-//     const leader = await Leader.create({
-//       fullName,
-//       position,
-//       bio,
-//       tenure,
-//       status: status || "draft",
-
-//       // imageUrl: req.file
-//       // ? `${process.env.SERVER_URL}/uploads/leaders/${req.file.filename}`
-//       // : null,
-//       imageUrl: req.file ? req.file.filename : null,
-//     });
-
-//     res.status(201).json(leader);
-//   } catch (error) {
-//     console.error("CREATE LEADER ERROR:", error);
-//     res.status(500).json({ message: "Failed to create leader" });
-//   }
-// };
 
 /* ===============================
    GET ALL LEADERS (ADMIN)
@@ -166,43 +119,6 @@ export const updateLeader = async (req, res) => {
 
   }
 };
-// export const updateLeader = async (req, res) => {
-//   try {
-//     const { fullName, position, bio, tenure, status } = req.body;
-
-//     const updateData = {
-//       fullName,
-//       position,
-//       bio,
-//       status,
-//     };
-
-//     // Only update tenure if it is valid
-//     if (tenure && tenure !== "") {
-//       updateData.tenure = tenure;
-//     }
-
-//     if (req.file) {
-//       updateData.imageUrl = req.file.filename;
-//     }
-
-//     const updated = await Leader.findByIdAndUpdate(
-//       req.params.id,
-//       updateData,
-//       { new: true }
-//     );
-
-//     if (!updated) {
-//       return res.status(404).json({ message: "Leader not found" });
-//     }
-
-//     res.json(updated);
-
-//   } catch (error) {
-//     console.error("UPDATE LEADER ERROR:", error);
-//     res.status(500).json({ message: "Failed to update leader" });
-//   }
-// };
 
 /* ===============================
    DELETE LEADER

@@ -374,7 +374,7 @@ export const downloadLetter = async (req, res) => {
   doc.text(`Status: Approved`);
 
   // 🔗 Verification link
-const verifyUrl = `https://your-frontend-domain.com/verify/${app.verificationCode}`;
+const verifyUrl = `https://ibionoibomlga.com/verify/${app.verificationCode}`;
 
 // 🧠 Generate QR as base64
 const qrImage = await QRCode.toDataURL(verifyUrl);
