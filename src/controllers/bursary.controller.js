@@ -23,7 +23,7 @@ export const applyBursary = async (req, res) => {
   try {
     console.log("BODY:", req.body);
     console.log("FILES:", req.files);
-    console.log("FINAL", {admissionLetter});
+    // console.log("FINAL", {admissionLetter});
     /* ================= GET DATA ================= */
     const {
       fullName,
@@ -96,20 +96,21 @@ export const applyBursary = async (req, res) => {
   const extractFile = (file) => {
   if (!file) return "";
 
-  console.log("FILE DEBUG:", file); // 🔥 MUST SEE THIS
+  console.log("FILE DEBUG:", file);
 
-  return (
-    file.secure_url || // images
-    file.path ||       // PDFs
-    file.url ||        // fallback
-    ""
-  );
+  // 🔥 ALWAYS PRIORITIZE CLOUDINARY URL
+  return file.secure_url || file.url || "";
 };
 
-const passport = extractFile(req.files?.passport?.[0]);
-const admissionLetter = extractFile(req.files?.admissionLetter?.[0]);
-const studentID = extractFile(req.files?.studentID?.[0]);
-const lgaCertificate = extractFile(req.files?.lgaCertificate?.[0]);
+const passportFile = req.files?.passport?.[0];
+const admissionFile = req.files?.admissionLetter?.[0];
+const studentFile = req.files?.studentID?.[0];
+const lgaFile = req.files?.lgaCertificate?.[0];
+
+const passport = extractFile(passportFile);
+const admissionLetter = extractFile(admissionFile);
+const studentID = extractFile(studentFile);
+const lgaCertificate = extractFile(lgaFile);
 
 // const passport = req.files?.passport?.[0]?.path || req.files?.passport?.[0]?.secure_url || "";
 // const admissionLetter = req.files?.admissionLetter?.[0]?.path || req.files?.admissionLetter?.[0]?.secure_url || "";
@@ -132,8 +133,8 @@ const bvnCheck = await verifyBVNExternal(bvn);
 const ninCheck = await verifyNINExternal(nin);
 
 const faceCheck = await verifyFaceMatch(
-  req.files?.passport?.[0]?.path,
-  req.files?.studentID?.[0]?.path
+  passportFile?.path || passportFile?.secure_url,
+  studentFile?.path || studentFile?.secure_url
 );
 
 /* ================= FINAL STATUS ================= */
@@ -177,14 +178,10 @@ if (isFraud) {
       trackingId,
       verificationCode,
 
-      verificationStatus,
+      verificationStatus: isFraud ? "failed" : "verified",
       fraudFlag: isFraud,
 
       user: req.user?._id,
-
-      // ✅ FIXED
-      verificationStatus: isFraud ? "failed" : "verified",
-      fraudFlag: isFraud,
     });
 
     /* ================= RESPONSE ================= */
