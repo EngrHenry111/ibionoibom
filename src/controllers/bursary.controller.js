@@ -93,7 +93,7 @@ export const applyBursary = async (req, res) => {
 
     /* ================= FILES ================= */
 const getFileUrl = (file) => {
-  return file?.secure_url || file?.url || "";
+  return file?.secure_url || file?.path || file?.url || "";
 };
 
 const passport = getFileUrl(req.files?.passport?.[0]);
