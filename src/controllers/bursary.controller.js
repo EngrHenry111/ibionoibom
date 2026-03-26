@@ -23,6 +23,7 @@ export const applyBursary = async (req, res) => {
   try {
     console.log("BODY:", req.body);
     console.log("FILES:", req.files);
+    console.log("FINAL", {admissionLetter});
     /* ================= GET DATA ================= */
     const {
       fullName,
@@ -92,14 +93,23 @@ export const applyBursary = async (req, res) => {
     }
 
     /* ================= FILES ================= */
-const getFileUrl = (file) => {
-  return file?.secure_url || file?.path || file?.url || "";
+  const extractFile = (file) => {
+  if (!file) return "";
+
+  console.log("FILE DEBUG:", file); // 🔥 MUST SEE THIS
+
+  return (
+    file.secure_url || // images
+    file.path ||       // PDFs
+    file.url ||        // fallback
+    ""
+  );
 };
 
-const passport = getFileUrl(req.files?.passport?.[0]);
-const admissionLetter = getFileUrl(req.files?.admissionLetter?.[0]);
-const studentID = getFileUrl(req.files?.studentID?.[0]);
-const lgaCertificate = getFileUrl(req.files?.lgaCertificate?.[0]);
+const passport = extractFile(req.files?.passport?.[0]);
+const admissionLetter = extractFile(req.files?.admissionLetter?.[0]);
+const studentID = extractFile(req.files?.studentID?.[0]);
+const lgaCertificate = extractFile(req.files?.lgaCertificate?.[0]);
 
 // const passport = req.files?.passport?.[0]?.path || req.files?.passport?.[0]?.secure_url || "";
 // const admissionLetter = req.files?.admissionLetter?.[0]?.path || req.files?.admissionLetter?.[0]?.secure_url || "";
