@@ -15,7 +15,7 @@ import crypto from "crypto";
 import PDFDocument from "pdfkit";
 import QRCode from "qrcode";
 // import path from "path";
-import { sendEmail } from "../utils/sendEmails.js";
+// import { sendEmail } from "../utils/sendEmails.js";
 
 
 /* ================= APPLY BURSARY ================= */
@@ -95,7 +95,8 @@ export const applyBursary = async (req, res) => {
 const passport = req.files?.passport?.[0]?.secure_url || "";
 const admissionLetter = req.files?.admissionLetter?.[0]?.secure_url || "";
 const studentID = req.files?.studentID?.[0]?.secure_url || "";
-const lgaCertificate = req.files?.lgaCertificate?.[0]?.secure_url || "";// const passport = req.files?.passport?.[0]?.path || req.files?.passport?.[0]?.secure_url || "";
+const lgaCertificate = req.files?.lgaCertificate?.[0]?.secure_url || "";
+// const passport = req.files?.passport?.[0]?.path || req.files?.passport?.[0]?.secure_url || "";
 // const admissionLetter = req.files?.admissionLetter?.[0]?.path || req.files?.admissionLetter?.[0]?.secure_url || "";
 // const studentID = req.files?.studentID?.[0]?.path || req.files?.studentID?.[0]?.secure_url || "";
 // const lgaCertificate = req.files?.lgaCertificate?.[0]?.path || req.files?.lgaCertificate?.[0]?.secure_url || "";

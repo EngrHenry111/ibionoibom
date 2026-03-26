@@ -18,21 +18,18 @@ const router = express.Router();
 
 /* ================= APPLY ================= */
 
-router.post("/apply", protectStudent, (req, res, next) => {
+router.post(
+  "/apply",
+  protectStudent,
   uploadBursaryDocuments.fields([
     { name: "passport", maxCount: 1 },
     { name: "admissionLetter", maxCount: 1 },
     { name: "studentID", maxCount: 1 },
     { name: "lgaCertificate", maxCount: 1 },
-  ])(req, res, function (err) {
-    if (err) {
-      console.error("UPLOAD ERROR:", err.message);
-      return res.status(400).json({ message: err.message });
-    }
+  ]),
+  applyBursary
+);
 
-    next();
-  });
-}, applyBursary);
 // router.post(
 //   "/apply",
 //   protectStudent,
@@ -51,6 +48,7 @@ router.get("/my", protectStudent, getMyApplications);
 /* ================= ADMIN ================= */
 router.get("/", protect, getAllApplications);
 router.patch("/:id/status", protect, updateApplicationStatus);
+
 
 /* ================= PUBLIC ================= */
 router.get("/letter/:id", generateLetter);
