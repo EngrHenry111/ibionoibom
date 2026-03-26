@@ -101,13 +101,17 @@ export const uploadNewsImages = multer({
 const bursaryStorage = new CloudinaryStorage({
   cloudinary,
   params: async (req, file) => {
-    let folder = "ibiono/bursary";
-
     return {
-      folder,
+      folder: "ibiono/bursary",
 
-      // 🔥 FORCE EVERYTHING TO IMAGE (IMPORTANT)
+      // 🔥 FORCE IMAGE PROCESSING
       resource_type: "image",
+
+      // 🔥 VERY IMPORTANT (THIS FIXES PDF PREVIEW)
+      flags: "attachment:false",
+
+      // 🔥 ENSURE PDF IS TRANSFORMABLE
+      format: file.mimetype === "application/pdf" ? "png" : undefined,
 
       allowed_formats: ["jpg", "jpeg", "png", "webp", "pdf"],
     };
