@@ -104,15 +104,22 @@ const bursaryStorage = new CloudinaryStorage({
 
     let folder = "ibiono/bursary";
 
-    const isPDF = file.mimetype === "application/pdf";
-
     return {
       folder,
-      resource_type: "auto", // 🔥 FIXED
-      allowed_formats: isPDF
-        ? ["pdf"]
-        : ["jpg", "jpeg", "png", "webp"],
-    };
+      resource_type: "auto",
+      use_filename: true,
+      unique_filename: true,
+    }
+
+    // const isPDF = file.mimetype === "application/pdf";
+
+    // return {
+    //   folder,
+    //   resource_type: "auto", // 🔥 FIXED
+    //   allowed_formats: isPDF
+    //     ? ["pdf"]
+    //     : ["jpg", "jpeg", "png", "webp"],
+    // };
   },
 });
 
