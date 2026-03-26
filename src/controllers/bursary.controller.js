@@ -99,7 +99,7 @@ export const applyBursary = async (req, res) => {
   console.log("FILE DEBUG:", file);
 
   // 🔥 ALWAYS PRIORITIZE CLOUDINARY URL
-  return file.secure_url || file.url || "";
+  return file.path || file.secure_url || file.url || "";
 };
 
 const passportFile = req.files?.passport?.[0];
