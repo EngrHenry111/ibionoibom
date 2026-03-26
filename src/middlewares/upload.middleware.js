@@ -94,34 +94,51 @@ export const uploadNewsImages = multer({
 /* ===============================
    CLOUDINARY STORAGE - BURSARY
 ================================ */
-
 const bursaryStorage = new CloudinaryStorage({
   cloudinary,
   params: async (req, file) => {
-    let folder = "ibiono/bursary/others";
 
-    // 📂 Dynamic folder structure
-    if (file.fieldname === "passport") {
-      folder = "ibiono/bursary/passport";
-    } else if (file.fieldname === "admissionLetter") {
-      folder = "ibiono/bursary/admission";
-    } else if (file.fieldname === "studentID") {
-      folder = "ibiono/bursary/id";
-    } else if (file.fieldname === "lgaCertificate") {
-      folder = "ibiono/bursary/lga";
-    }
+    let folder = "ibiono/bursary";
 
     const isPDF = file.mimetype === "application/pdf";
 
-  return {
-    folder,
-    resource_type: isPDF ? "raw" : "image",
-    allowed_formats: isPDF
-      ? ["pdf"]
-      : ["jpg", "jpeg", "png", "webp"],
-  };
-    },
-  });
+    return {
+      folder,
+      resource_type: "auto", // 🔥 FIXED
+      allowed_formats: isPDF
+        ? ["pdf"]
+        : ["jpg", "jpeg", "png", "webp"],
+    };
+  },
+});
+
+// const bursaryStorage = new CloudinaryStorage({
+//   cloudinary,
+//   params: async (req, file) => {
+//     let folder = "ibiono/bursary/others";
+
+//     // 📂 Dynamic folder structure
+//     if (file.fieldname === "passport") {
+//       folder = "ibiono/bursary/passport";
+//     } else if (file.fieldname === "admissionLetter") {
+//       folder = "ibiono/bursary/admission";
+//     } else if (file.fieldname === "studentID") {
+//       folder = "ibiono/bursary/id";
+//     } else if (file.fieldname === "lgaCertificate") {
+//       folder = "ibiono/bursary/lga";
+//     }
+
+//     const isPDF = file.mimetype === "application/pdf";
+
+//   return {
+//     folder,
+//     resource_type: isPDF ? "raw" : "image",
+//     allowed_formats: isPDF
+//       ? ["pdf"]
+//       : ["jpg", "jpeg", "png", "webp"],
+//   };
+//     },
+//   });
 
 /* ===============================
    EXPORT BURSARY UPLOADER
