@@ -93,17 +93,20 @@ export const applyBursary = async (req, res) => {
 
     /* ================= FILES ================= */
 const passport =
-  req.files?.passport?.[0]?.secure_url || "";
+  req.files?.passport?.[0]?.secure_url ||
+  req.files?.passport?.[0]?.path || "";
 
 const admissionLetter =
-  req.files?.admissionLetter?.[0]?.secure_url || "";
+  req.files?.admissionLetter?.[0]?.secure_url ||
+  req.files?.admissionLetter?.[0]?.path || "";
 
 const studentID =
-  req.files?.studentID?.[0]?.secure_url || "";
+  req.files?.studentID?.[0]?.secure_url ||
+  req.files?.studentID?.[0]?.path || "";
 
 const lgaCertificate =
-  req.files?.lgaCertificate?.[0]?.secure_url || "";
-
+  req.files?.lgaCertificate?.[0]?.secure_url ||
+  req.files?.lgaCertificate?.[0]?.path || "";
 
 // const passport = req.files?.passport?.[0]?.path || req.files?.passport?.[0]?.secure_url || "";
 // const admissionLetter = req.files?.admissionLetter?.[0]?.path || req.files?.admissionLetter?.[0]?.secure_url || "";
