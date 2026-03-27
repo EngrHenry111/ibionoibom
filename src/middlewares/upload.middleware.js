@@ -9,39 +9,47 @@ import cloudinary from "../config/cloudinary.js";
 /* ===============================
    SMART FILE VALIDATION
 ================================ */
+
 const fileFilter = (req, file, cb) => {
-  const { fieldname, mimetype } = file;
-
-  // 📌 Passport → image only
-  if (fieldname === "passport") {
-    if (!mimetype.startsWith("image/")) {
-      return cb(new Error("Passport must be an image"), false);
-    }
+  if (!file.mimetype.startsWith("image/")) {
+    return cb(new Error("Only image files are allowed"), false);
   }
-
-  // 📌 Student ID → image only
-  if (fieldname === "studentID") {
-    if (!mimetype.startsWith("image/")) {
-      return cb(new Error("Student ID must be an image"), false);
-    }
-  }
-
-  // 📌 Admission Letter → PDF only
-  if (fieldname === "admissionLetter") {
-    if (mimetype !== "application/pdf") {
-      return cb(new Error("Admission Letter must be PDF"), false);
-    }
-  }
-
-  // 📌 LGA Certificate → PDF only
-  if (fieldname === "lgaCertificate") {
-    if (mimetype !== "application/pdf") {
-      return cb(new Error("LGA Certificate must be PDF"), false);
-    }
-  }
-
   cb(null, true);
 };
+
+// const fileFilter = (req, file, cb) => {
+//   const { fieldname, mimetype } = file;
+
+//   // 📌 Passport → image only
+//   if (fieldname === "passport") {
+//     if (!mimetype.startsWith("image/")) {
+//       return cb(new Error("Passport must be an image"), false);
+//     }
+//   }
+
+//   // 📌 Student ID → image only
+//   if (fieldname === "studentID") {
+//     if (!mimetype.startsWith("image/")) {
+//       return cb(new Error("Student ID must be an image"), false);
+//     }
+//   }
+
+//   // 📌 Admission Letter → PDF only
+//   if (fieldname === "admissionLetter") {
+//     if (mimetype !== "application/pdf") {
+//       return cb(new Error("Admission Letter must be PDF"), false);
+//     }
+//   }
+
+//   // 📌 LGA Certificate → PDF only
+//   if (fieldname === "lgaCertificate") {
+//     if (mimetype !== "application/pdf") {
+//       return cb(new Error("LGA Certificate must be PDF"), false);
+//     }
+//   }
+
+//   cb(null, true);
+// };
 
 // const fileFilter = (req, file, cb) => {
 //   console.log("UPLOAD FILE:", file.fieldname, file.mimetype);
@@ -98,34 +106,19 @@ export const uploadNewsImages = multer({
 /* ===============================
    CLOUDINARY STORAGE - BURSARY
 ================================ */
-
 export const bursaryStorage = new CloudinaryStorage({
   cloudinary,
   params: async (req, file) => {
-    const isPDF = file.mimetype === "application/pdf";
-
     return {
       folder: "ibiono/bursary",
-
-      // ✅ KEEP THIS
-      resource_type: isPDF ? "raw" : "image",
-
-      // ✅ REMOVE access_mode (important)
-      // access_mode: "public", ❌ remove this
-
-      // ✅ FORCE DELIVERY TYPE
-      type: "upload",
-
-      // ✅ ADD THIS (VERY IMPORTANT)
-      use_filename: true,
-      unique_filename: false,
-
-      allowed_formats: ["jpg", "jpeg", "png", "webp", "pdf"],
-
+      resource_type: "image", // ✅ force image only
+      allowed_formats: ["jpg", "jpeg", "png", "webp"],
       public_id: `${Date.now()}-${file.originalname.split(".")[0]}`,
     };
   },
 });
+
+
 
 // export const bursaryStorage = new CloudinaryStorage({
 //   cloudinary,
@@ -200,4 +193,7 @@ export const bursaryStorage = new CloudinaryStorage({
 export const uploadBursaryDocuments = multer({
   storage: bursaryStorage,
   fileFilter,
+  limits: {
+    fileSize: 1 * 1024 * 1024, // ✅ 1MB
+  },
 });
