@@ -412,7 +412,7 @@ export const applyBursary = async (req, res) => {
   //     message: "Failed to submit application",
   //   });
   // }
-};
+// };
 
 
 export const generateLetter = async (req, res) => {
