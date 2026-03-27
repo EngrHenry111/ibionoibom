@@ -98,19 +98,23 @@ export const uploadNewsImages = multer({
 /* ===============================
    CLOUDINARY STORAGE - BURSARY
 ================================ */
+
 export const bursaryStorage = new CloudinaryStorage({
   cloudinary,
   params: async (req, file) => {
+    const isPDF = file.mimetype === "application/pdf";
+
     return {
       folder: "ibiono/bursary",
 
-      // ✅ FIX: let Cloudinary decide automatically
-      resource_type: "auto",
+      // ✅ THIS IS THE KEY FIX
+      resource_type: isPDF ? "raw" : "image",
 
-      // ✅ allow all formats you need
+      type: "upload",
+      access_mode: "public",
+
       allowed_formats: ["jpg", "jpeg", "png", "webp", "pdf"],
 
-      // ✅ keep naming clean
       public_id: `${Date.now()}-${file.originalname.split(".")[0]}`,
     };
   },
