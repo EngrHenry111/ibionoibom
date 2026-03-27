@@ -99,15 +99,28 @@ export const uploadNewsImages = multer({
    CLOUDINARY STORAGE - BURSARY
 ================================ */
 
-const bursaryStorage = new CloudinaryStorage({
+import { CloudinaryStorage } from "multer-storage-cloudinary";
+import cloudinary from "../config/cloudinary.js";
+
+export const bursaryStorage = new CloudinaryStorage({
   cloudinary,
-  params: {
-    folder: "ibiono/bursary",
-    resource_type: "auto", // handles both image & pdf
-    access_mode: "public" 
+  params: async (req, file) => {
+    const isPDF = file.mimetype === "application/pdf";
+
+    return {
+      folder: "ibiono/bursary",
+
+      // ✅ IMPORTANT
+      resource_type: isPDF ? "raw" : "image",
+
+      // ✅ FORCE PUBLIC ACCESS
+      type: "upload",
+
+      // ✅ KEEP ORIGINAL NAME
+      public_id: `${Date.now()}-${file.originalname.split(".")[0]}`,
+    };
   },
 });
-
 // const bursaryStorage = new CloudinaryStorage({
 //   cloudinary,
 //   params: async (req, file) => {

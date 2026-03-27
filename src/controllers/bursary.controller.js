@@ -93,25 +93,19 @@ export const applyBursary = async (req, res) => {
     }
 
     /* ================= FILES ================= */
-   // ================= FILES =================
-
-const passportFile = req.files?.passport?.[0];
-const admissionFile = req.files?.admissionLetter?.[0];
-const studentFile = req.files?.studentID?.[0];
-const lgaFile = req.files?.lgaCertificate?.[0];
-
+   
 const getFileUrl = (file) => {
   if (!file) return "";
 
-  return file.path || file.secure_url || file.url || "";
+  return file.path; // ✅ ALWAYS Cloudinary URL
 };
 
-const passport = getFileUrl(passportFile);
-const admissionLetter = getFileUrl(admissionFile);
-const studentID = getFileUrl(studentFile);
-const lgaCertificate = getFileUrl(lgaFile);
+const passport = getFileUrl(req.files?.passport?.[0]);
+const admissionLetter = getFileUrl(req.files?.admissionLetter?.[0]);
+const studentID = getFileUrl(req.files?.studentID?.[0]);
+const lgaCertificate = getFileUrl(req.files?.lgaCertificate?.[0]);
 
-console.log("FILES SAVED:", {
+console.log("FILES:", {
   passport,
   admissionLetter,
   studentID,
