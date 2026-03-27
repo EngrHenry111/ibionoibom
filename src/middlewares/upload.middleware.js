@@ -99,8 +99,8 @@ export const uploadNewsImages = multer({
    CLOUDINARY STORAGE - BURSARY
 ================================ */
 
-import { CloudinaryStorage } from "multer-storage-cloudinary";
-import cloudinary from "../config/cloudinary.js";
+// import { CloudinaryStorage } from "multer-storage-cloudinary";
+// import cloudinary from "../config/cloudinary.js";
 
 export const bursaryStorage = new CloudinaryStorage({
   cloudinary,
