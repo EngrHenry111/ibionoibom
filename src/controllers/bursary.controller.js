@@ -90,10 +90,9 @@ export const applyBursary = async (req, res) => {
     }
 
     /* ================= FILES ================= */
-    const getFileUrl = (url) => {
-  if (!url) return "";
-
-  return url.replace("/image/upload/", "/raw/upload/"); // Cloudinary URL
+    const getFileUrl = (file) => {
+      if (!file) return "";
+      return file.path; // Cloudinary URL
     };
 
     const passport = getFileUrl(req.files?.passport?.[0]);
