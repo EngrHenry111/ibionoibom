@@ -148,29 +148,50 @@ console.log("FILES:", {
     const verificationCode = crypto.randomBytes(8).toString("hex");
     /* ================= EXTERNAL VERIFICATION ================= */
 
-const bvnCheck = await verifyBVNExternal(bvn);
-const ninCheck = await verifyNINExternal(nin);
+    let bvnCheck = { status: "fallback" };
+    let ninCheck = { status: "fallback" };
+    let faceCheck = { status: "fallback" };
 
-const faceCheck = await verifyFaceMatch(
-  passportFile?.path || passportFile?.secure_url,
-  studentFile?.path || studentFile?.secure_url
-);
+    try {
+      bvnCheck = await verifyBVNExternal(bvn);
+    } catch (err) {
+      console.log("BVN API failed:", err.message);
+    }
 
+    try {
+      ninCheck = await verifyNINExternal(nin);
+    } catch (err) {
+      console.log("NIN API failed:", err.message);
+    }
+
+    try {
+      faceCheck = await verifyFaceMatch(passport, studentID);
+    } catch (err) {
+      console.log("Face match failed:", err.message);
+    }
+
+// const bvnCheck = await verifyBVNExternal(bvn);
+// const ninCheck = await verifyNINExternal(nin);
+
+// const faceCheck = await verifyFaceMatch(
+//   passport,
+//   studentID
+// );
 /* ================= FINAL STATUS ================= */
 
-let verificationStatus = "verified";
+      let verificationStatus = "verified";
 
-if (
-  bvnCheck.status === "fallback" ||
-  ninCheck.status === "fallback" ||
-  faceCheck.status === "fallback"
-) {
-  verificationStatus = "unverified"; // safe fallback
-}
+      if (
+        bvnCheck.status === "fallback" ||
+        ninCheck.status === "fallback" ||
+        faceCheck.status === "fallback"
+      ) {
+        verificationStatus = "unverified"; // safe fallback
+      }
 
-if (isFraud) {
-  verificationStatus = "failed";
-}
+      if (isFraud) {
+        verificationStatus = "failed";
+      }
 
     /* ================= CREATE ================= */
     const application = await Bursary.create({
@@ -197,7 +218,8 @@ if (isFraud) {
       trackingId,
       verificationCode,
 
-      verificationStatus: isFraud ? "failed" : "verified",
+      // verificationStatus: isFraud ? "failed" : "verified",
+      verificationStatus,
       fraudFlag: isFraud,
 
       user: req.user?._id,
