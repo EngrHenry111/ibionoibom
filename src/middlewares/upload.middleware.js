@@ -104,6 +104,7 @@ const bursaryStorage = new CloudinaryStorage({
   params: {
     folder: "ibiono/bursary",
     resource_type: "auto", // handles both image & pdf
+    access_mode: "public" 
   },
 });
 
