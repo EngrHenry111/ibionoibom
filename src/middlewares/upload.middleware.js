@@ -98,29 +98,43 @@ export const uploadNewsImages = multer({
 /* ===============================
    CLOUDINARY STORAGE - BURSARY
 ================================ */
-
-// import { CloudinaryStorage } from "multer-storage-cloudinary";
-// import cloudinary from "../config/cloudinary.js";
-
 export const bursaryStorage = new CloudinaryStorage({
   cloudinary,
   params: async (req, file) => {
-    const isPDF = file.mimetype === "application/pdf";
-
     return {
       folder: "ibiono/bursary",
 
-      // ✅ IMPORTANT
-      resource_type: isPDF ? "raw" : "image",
+      // ✅ FIX: let Cloudinary decide automatically
+      resource_type: "auto",
 
-      // ✅ FORCE PUBLIC ACCESS
-      type: "upload",
+      // ✅ allow all formats you need
+      allowed_formats: ["jpg", "jpeg", "png", "webp", "pdf"],
 
-      // ✅ KEEP ORIGINAL NAME
+      // ✅ keep naming clean
       public_id: `${Date.now()}-${file.originalname.split(".")[0]}`,
     };
   },
 });
+
+// export const bursaryStorage = new CloudinaryStorage({
+//   cloudinary,
+//   params: async (req, file) => {
+//     const isPDF = file.mimetype === "application/pdf";
+
+//     return {
+//       folder: "ibiono/bursary",
+
+//       // ✅ IMPORTANT
+//       resource_type: isPDF ? "raw" : "image",
+
+//       // ✅ FORCE PUBLIC ACCESS
+//       type: "upload",
+
+//       // ✅ KEEP ORIGINAL NAME
+//       public_id: `${Date.now()}-${file.originalname.split(".")[0]}`,
+//     };
+//   },
+// });
 // const bursaryStorage = new CloudinaryStorage({
 //   cloudinary,
 //   params: async (req, file) => {
