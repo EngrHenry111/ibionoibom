@@ -98,25 +98,34 @@ export const uploadNewsImages = multer({
 /* ===============================
    CLOUDINARY STORAGE - BURSARY
 ================================ */
+
 const bursaryStorage = new CloudinaryStorage({
   cloudinary,
-  params: async (req, file) => {
-    return {
-      folder: "ibiono/bursary",
-
-      // 🔥 FORCE IMAGE PROCESSING
-      resource_type: "image",
-
-      // 🔥 VERY IMPORTANT (THIS FIXES PDF PREVIEW)
-      flags: "attachment:false",
-
-      // 🔥 ENSURE PDF IS TRANSFORMABLE
-      format: file.mimetype === "application/pdf" ? "png" : undefined,
-
-      allowed_formats: ["jpg", "jpeg", "png", "webp", "pdf"],
-    };
+  params: {
+    folder: "ibiono/bursary",
+    resource_type: "auto", // handles both image & pdf
   },
 });
+
+// const bursaryStorage = new CloudinaryStorage({
+//   cloudinary,
+//   params: async (req, file) => {
+//     return {
+//       folder: "ibiono/bursary",
+
+      // 🔥 FORCE IMAGE PROCESSING
+      // resource_type: "auto", // resource_type: "auto"
+
+      // 🔥 VERY IMPORTANT (THIS FIXES PDF PREVIEW)
+      // flags: "attachment:false",
+
+      // 🔥 ENSURE PDF IS TRANSFORMABLE
+      // format: file.mimetype === "application/pdf" ? "png" : undefined,
+
+//       allowed_formats: ["jpg", "jpeg", "png", "webp", "pdf"],
+//     };
+//   },
+// });
 // const bursaryStorage = new CloudinaryStorage({
 //   cloudinary,
 //   params: async (req, file) => {

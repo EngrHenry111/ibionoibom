@@ -93,24 +93,33 @@ export const applyBursary = async (req, res) => {
     }
 
     /* ================= FILES ================= */
-  const extractFile = (file) => {
+    const getFileUrl = (file) => {
   if (!file) return "";
-
-  console.log("FILE DEBUG:", file);
-
-  // 🔥 ALWAYS PRIORITIZE CLOUDINARY URL
-  return file.path || file.secure_url || file.url || "";
+  return file.path; // Cloudinary always returns path
 };
 
-const passportFile = req.files?.passport?.[0];
-const admissionFile = req.files?.admissionLetter?.[0];
-const studentFile = req.files?.studentID?.[0];
-const lgaFile = req.files?.lgaCertificate?.[0];
+const passport = getFileUrl(req.files?.passport?.[0]);
+const admissionLetter = getFileUrl(req.files?.admissionLetter?.[0]);
+const studentID = getFileUrl(req.files?.studentID?.[0]);
+const lgaCertificate = getFileUrl(req.files?.lgaCertificate?.[0]);
+  // const extractFile = (file) => {
+  // if (!file) return "";
 
-const passport = extractFile(passportFile);
-const admissionLetter = extractFile(admissionFile);
-const studentID = extractFile(studentFile);
-const lgaCertificate = extractFile(lgaFile);
+  // console.log("FILE DEBUG:", file);
+
+  // 🔥 ALWAYS PRIORITIZE CLOUDINARY URL
+//   return file.path || file.secure_url || file.url || "";
+// };
+
+// const passportFile = req.files?.passport?.[0];
+// const admissionFile = req.files?.admissionLetter?.[0];
+// const studentFile = req.files?.studentID?.[0];
+// const lgaFile = req.files?.lgaCertificate?.[0];
+
+// const passport = extractFile(passportFile);
+// const admissionLetter = extractFile(admissionFile);
+// const studentID = extractFile(studentFile);
+// const lgaCertificate = extractFile(lgaFile);
 
 // const passport = req.files?.passport?.[0]?.path || req.files?.passport?.[0]?.secure_url || "";
 // const admissionLetter = req.files?.admissionLetter?.[0]?.path || req.files?.admissionLetter?.[0]?.secure_url || "";
