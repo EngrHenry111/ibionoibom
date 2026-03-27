@@ -19,11 +19,13 @@ import QRCode from "qrcode";
 
 
 /* ================= APPLY BURSARY ================= */
+
+/* ================= APPLY BURSARY ================= */
 export const applyBursary = async (req, res) => {
   try {
     console.log("BODY:", req.body);
     console.log("FILES:", req.files);
-    // console.log("FINAL", {admissionLetter});
+
     /* ================= GET DATA ================= */
     const {
       fullName,
@@ -78,12 +80,7 @@ export const applyBursary = async (req, res) => {
 
     /* ================= DUPLICATE CHECK ================= */
     const existing = await Bursary.findOne({
-      $or: [
-        { email },
-        { matricNumber },
-        { bvn },
-        { nin },
-      ],
+      $or: [{ email }, { matricNumber }, { bvn }, { nin }],
     });
 
     if (existing) {
@@ -93,61 +90,30 @@ export const applyBursary = async (req, res) => {
     }
 
     /* ================= FILES ================= */
-   
-const getFileUrl = (file) => {
-  if (!file) return "";
+    const getFileUrl = (file) => {
+      if (!file) return "";
+      return file.path; // Cloudinary URL
+    };
 
-  return file.path; // ✅ ALWAYS Cloudinary URL
-};
+    const passport = getFileUrl(req.files?.passport?.[0]);
+    const admissionLetter = getFileUrl(req.files?.admissionLetter?.[0]);
+    const studentID = getFileUrl(req.files?.studentID?.[0]);
+    const lgaCertificate = getFileUrl(req.files?.lgaCertificate?.[0]);
 
-const passport = getFileUrl(req.files?.passport?.[0]);
-const admissionLetter = getFileUrl(req.files?.admissionLetter?.[0]);
-const studentID = getFileUrl(req.files?.studentID?.[0]);
-const lgaCertificate = getFileUrl(req.files?.lgaCertificate?.[0]);
-
-console.log("FILES:", {
-  passport,
-  admissionLetter,
-  studentID,
-  lgaCertificate,
-});
-
-  // const extractFile = (file) => {
-  // if (!file) return "";
-
-  // console.log("FILE DEBUG:", file);
-
-  // 🔥 ALWAYS PRIORITIZE CLOUDINARY URL
-//   return file.path || file.secure_url || file.url || "";
-// };
-
-// const passportFile = req.files?.passport?.[0];
-// const admissionFile = req.files?.admissionLetter?.[0];
-// const studentFile = req.files?.studentID?.[0];
-// const lgaFile = req.files?.lgaCertificate?.[0];
-
-// const passport = extractFile(passportFile);
-// const admissionLetter = extractFile(admissionFile);
-// const studentID = extractFile(studentFile);
-// const lgaCertificate = extractFile(lgaFile);
-
-// const passport = req.files?.passport?.[0]?.path || req.files?.passport?.[0]?.secure_url || "";
-// const admissionLetter = req.files?.admissionLetter?.[0]?.path || req.files?.admissionLetter?.[0]?.secure_url || "";
-// const studentID = req.files?.studentID?.[0]?.path || req.files?.studentID?.[0]?.secure_url || "";
-// const lgaCertificate = req.files?.lgaCertificate?.[0]?.path || req.files?.lgaCertificate?.[0]?.secure_url || "";
-   
-// const passport = req.files?.passport?.[0]?.path || "";
-    // const admissionLetter = req.files?.admissionLetter?.[0]?.path || "";
-    // const studentID = req.files?.studentID?.[0]?.path || "";
-    // const lgaCertificate = req.files?.lgaCertificate?.[0]?.path || "";
+    console.log("FILES EXTRACTED:", {
+      passport,
+      admissionLetter,
+      studentID,
+      lgaCertificate,
+    });
 
     /* ================= GENERATE IDS ================= */
     const trackingId =
       "IBB-" + crypto.randomBytes(4).toString("hex").toUpperCase();
 
     const verificationCode = crypto.randomBytes(8).toString("hex");
-    /* ================= EXTERNAL VERIFICATION ================= */
 
+    /* ================= SAFE EXTERNAL VERIFICATION ================= */
     let bvnCheck = { status: "fallback" };
     let ninCheck = { status: "fallback" };
     let faceCheck = { status: "fallback" };
@@ -170,28 +136,20 @@ console.log("FILES:", {
       console.log("Face match failed:", err.message);
     }
 
-// const bvnCheck = await verifyBVNExternal(bvn);
-// const ninCheck = await verifyNINExternal(nin);
+    /* ================= FINAL STATUS ================= */
+    let verificationStatus = "verified";
 
-// const faceCheck = await verifyFaceMatch(
-//   passport,
-//   studentID
-// );
-/* ================= FINAL STATUS ================= */
+    if (
+      bvnCheck.status === "fallback" ||
+      ninCheck.status === "fallback" ||
+      faceCheck.status === "fallback"
+    ) {
+      verificationStatus = "unverified";
+    }
 
-      let verificationStatus = "verified";
-
-      if (
-        bvnCheck.status === "fallback" ||
-        ninCheck.status === "fallback" ||
-        faceCheck.status === "fallback"
-      ) {
-        verificationStatus = "unverified"; // safe fallback
-      }
-
-      if (isFraud) {
-        verificationStatus = "failed";
-      }
+    if (isFraud) {
+      verificationStatus = "failed";
+    }
 
     /* ================= CREATE ================= */
     const application = await Bursary.create({
@@ -203,25 +161,18 @@ console.log("FILES:", {
       course,
       level,
       lga,
-
       accountNumber,
       bankName,
-
       bvn,
       nin,
-
       passport,
       admissionLetter,
       studentID,
       lgaCertificate,
-
       trackingId,
       verificationCode,
-
-      // verificationStatus: isFraud ? "failed" : "verified",
       verificationStatus,
       fraudFlag: isFraud,
-
       user: req.user?._id,
     });
 
@@ -231,16 +182,217 @@ console.log("FILES:", {
       trackingId: application.trackingId,
     });
 
-    } catch (error) {
-  console.error("🔥 APPLY BURSARY FULL ERROR:", error);
-  console.error("🔥 ERROR MESSAGE:", error.message);
-  console.error("🔥 ERROR STACK:", error.stack);
+  } catch (error) {
+    console.error("🔥 APPLY BURSARY FULL ERROR:", error);
+    console.error("🔥 ERROR MESSAGE:", error.message);
+    console.error("🔥 ERROR STACK:", error.stack);
 
-  return res.status(500).json({
-    message: error.message || "Failed to submit application",
-  });
-}
-  // } catch (error) {
+    return res.status(500).json({
+      message: error.message || "Failed to submit application",
+    });
+  }
+};
+
+// export const applyBursary = async (req, res) => {
+//   try {
+//     console.log("BODY:", req.body);
+//     console.log("FILES:", req.files);
+//     // console.log("FINAL", {admissionLetter});
+//     /* ================= GET DATA ================= */
+//     const {
+//       fullName,
+//       email,
+//       phone,
+//       matricNumber,
+//       institution,
+//       course,
+//       level,
+//       lga,
+//       accountNumber,
+//       bankName,
+//       bvn,
+//       nin,
+//     } = req.body;
+
+//     /* ================= BASIC VALIDATION ================= */
+//     if (
+//       !fullName ||
+//       !email ||
+//       !phone ||
+//       !matricNumber ||
+//       !accountNumber ||
+//       !bankName ||
+//       !bvn ||
+//       !nin
+//     ) {
+//       return res.status(400).json({
+//         message: "All required fields must be filled",
+//       });
+//     }
+
+//     /* ================= IDENTITY VALIDATION ================= */
+//     if (!validateBVN(bvn)) {
+//       return res.status(400).json({
+//         message: "Invalid BVN format",
+//       });
+//     }
+
+//     if (!validateNIN(nin)) {
+//       return res.status(400).json({
+//         message: "Invalid NIN format",
+//       });
+//     }
+
+//     /* ================= FRAUD DETECTION ================= */
+//     const isFraud = await detectFraud(Bursary, {
+//       email,
+//       bvn,
+//       nin,
+//     });
+
+//     /* ================= DUPLICATE CHECK ================= */
+//     const existing = await Bursary.findOne({
+//       $or: [
+//         { email },
+//         { matricNumber },
+//         { bvn },
+//         { nin },
+//       ],
+//     });
+
+//     if (existing) {
+//       return res.status(400).json({
+//         message: "You have already applied",
+//       });
+//     }
+
+//     /* ================= FILES ================= */
+   
+// const getFileUrl = (file) => {
+//   if (!file) return "";
+
+//   return file.path; // ✅ ALWAYS Cloudinary URL
+// };
+
+// const passport = getFileUrl(req.files?.passport?.[0]);
+// const admissionLetter = getFileUrl(req.files?.admissionLetter?.[0]);
+// const studentID = getFileUrl(req.files?.studentID?.[0]);
+// const lgaCertificate = getFileUrl(req.files?.lgaCertificate?.[0]);
+
+// console.log("FILES:", {
+//   passport,
+//   admissionLetter,
+//   studentID,
+//   lgaCertificate,
+// });
+
+//   // const extractFile = (file) => {
+//   // if (!file) return "";
+
+//   // console.log("FILE DEBUG:", file);
+
+//   // 🔥 ALWAYS PRIORITIZE CLOUDINARY URL
+// //   return file.path || file.secure_url || file.url || "";
+// // };
+
+// // const passportFile = req.files?.passport?.[0];
+// // const admissionFile = req.files?.admissionLetter?.[0];
+// // const studentFile = req.files?.studentID?.[0];
+// // const lgaFile = req.files?.lgaCertificate?.[0];
+
+// // const passport = extractFile(passportFile);
+// // const admissionLetter = extractFile(admissionFile);
+// // const studentID = extractFile(studentFile);
+// // const lgaCertificate = extractFile(lgaFile);
+
+// // const passport = req.files?.passport?.[0]?.path || req.files?.passport?.[0]?.secure_url || "";
+// // const admissionLetter = req.files?.admissionLetter?.[0]?.path || req.files?.admissionLetter?.[0]?.secure_url || "";
+// // const studentID = req.files?.studentID?.[0]?.path || req.files?.studentID?.[0]?.secure_url || "";
+// // const lgaCertificate = req.files?.lgaCertificate?.[0]?.path || req.files?.lgaCertificate?.[0]?.secure_url || "";
+   
+// // const passport = req.files?.passport?.[0]?.path || "";
+//     // const admissionLetter = req.files?.admissionLetter?.[0]?.path || "";
+//     // const studentID = req.files?.studentID?.[0]?.path || "";
+//     // const lgaCertificate = req.files?.lgaCertificate?.[0]?.path || "";
+
+//     /* ================= GENERATE IDS ================= */
+//     const trackingId =
+//       "IBB-" + crypto.randomBytes(4).toString("hex").toUpperCase();
+
+//     const verificationCode = crypto.randomBytes(8).toString("hex");
+//     /* ================= EXTERNAL VERIFICATION ================= */
+
+// const bvnCheck = await verifyBVNExternal(bvn);
+// const ninCheck = await verifyNINExternal(nin);
+
+// const faceCheck = await verifyFaceMatch(
+//   passportFile?.path || passportFile?.secure_url,
+//   studentFile?.path || studentFile?.secure_url
+// );
+
+// /* ================= FINAL STATUS ================= */
+
+// let verificationStatus = "verified";
+
+// if (
+//   bvnCheck.status === "fallback" ||
+//   ninCheck.status === "fallback" ||
+//   faceCheck.status === "fallback"
+// ) {
+//   verificationStatus = "unverified"; // safe fallback
+// }
+
+// if (isFraud) {
+//   verificationStatus = "failed";
+// }
+
+//     /* ================= CREATE ================= */
+//     const application = await Bursary.create({
+//       fullName,
+//       email,
+//       phone,
+//       matricNumber,
+//       institution,
+//       course,
+//       level,
+//       lga,
+
+//       accountNumber,
+//       bankName,
+
+//       bvn,
+//       nin,
+
+//       passport,
+//       admissionLetter,
+//       studentID,
+//       lgaCertificate,
+
+//       trackingId,
+//       verificationCode,
+
+//       verificationStatus: isFraud ? "failed" : "verified",
+//       fraudFlag: isFraud,
+
+//       user: req.user?._id,
+//     });
+
+//     /* ================= RESPONSE ================= */
+//     res.status(201).json({
+//       message: "Application submitted successfully",
+//       trackingId: application.trackingId,
+//     });
+
+//     } catch (error) {
+//   console.error("🔥 APPLY BURSARY FULL ERROR:", error);
+//   console.error("🔥 ERROR MESSAGE:", error.message);
+//   console.error("🔥 ERROR STACK:", error.stack);
+
+//   return res.status(500).json({
+//     message: error.message || "Failed to submit application",
+//   });
+// }
+//   // } catch (error) {
   //   console.error("APPLY BURSARY ERROR:", error);
 
   //   /* ================= MULTER ERROR HANDLING ================= */
