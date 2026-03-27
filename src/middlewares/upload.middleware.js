@@ -107,11 +107,18 @@ export const bursaryStorage = new CloudinaryStorage({
     return {
       folder: "ibiono/bursary",
 
-      // ✅ THIS IS THE KEY FIX
+      // ✅ KEEP THIS
       resource_type: isPDF ? "raw" : "image",
 
+      // ✅ REMOVE access_mode (important)
+      // access_mode: "public", ❌ remove this
+
+      // ✅ FORCE DELIVERY TYPE
       type: "upload",
-      access_mode: "public",
+
+      // ✅ ADD THIS (VERY IMPORTANT)
+      use_filename: true,
+      unique_filename: false,
 
       allowed_formats: ["jpg", "jpeg", "png", "webp", "pdf"],
 
