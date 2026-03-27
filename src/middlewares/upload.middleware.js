@@ -9,44 +9,44 @@ import cloudinary from "../config/cloudinary.js";
 /* ===============================
    SMART FILE VALIDATION
 ================================ */
-// const fileFilter = (req, file, cb) => {
-//   const { fieldname, mimetype } = file;
-
-//   // 📌 Passport → image only
-//   if (fieldname === "passport") {
-//     if (!mimetype.startsWith("image/")) {
-//       return cb(new Error("Passport must be an image"), false);
-//     }
-//   }
-
-//   // 📌 Student ID → image only
-//   if (fieldname === "studentID") {
-//     if (!mimetype.startsWith("image/")) {
-//       return cb(new Error("Student ID must be an image"), false);
-//     }
-//   }
-
-//   // 📌 Admission Letter → PDF only
-//   if (fieldname === "admissionLetter") {
-//     if (mimetype !== "application/pdf") {
-//       return cb(new Error("Admission Letter must be PDF"), false);
-//     }
-//   }
-
-//   // 📌 LGA Certificate → PDF only
-//   if (fieldname === "lgaCertificate") {
-//     if (mimetype !== "application/pdf") {
-//       return cb(new Error("LGA Certificate must be PDF"), false);
-//     }
-//   }
-
-//   cb(null, true);
-// };
-
 const fileFilter = (req, file, cb) => {
-  console.log("UPLOAD FILE:", file.fieldname, file.mimetype);
-  cb(null, true); // ✅ allow everything for now
+  const { fieldname, mimetype } = file;
+
+  // 📌 Passport → image only
+  if (fieldname === "passport") {
+    if (!mimetype.startsWith("image/")) {
+      return cb(new Error("Passport must be an image"), false);
+    }
+  }
+
+  // 📌 Student ID → image only
+  if (fieldname === "studentID") {
+    if (!mimetype.startsWith("image/")) {
+      return cb(new Error("Student ID must be an image"), false);
+    }
+  }
+
+  // 📌 Admission Letter → PDF only
+  if (fieldname === "admissionLetter") {
+    if (mimetype !== "application/pdf") {
+      return cb(new Error("Admission Letter must be PDF"), false);
+    }
+  }
+
+  // 📌 LGA Certificate → PDF only
+  if (fieldname === "lgaCertificate") {
+    if (mimetype !== "application/pdf") {
+      return cb(new Error("LGA Certificate must be PDF"), false);
+    }
+  }
+
+  cb(null, true);
 };
+
+// const fileFilter = (req, file, cb) => {
+//   console.log("UPLOAD FILE:", file.fieldname, file.mimetype);
+//   cb(null, true); // ✅ allow everything for now
+// };
 
 // const fileFilter = (req, file, cb) => {
 
