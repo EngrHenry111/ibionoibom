@@ -1,70 +1,23 @@
 import multer from "multer";
 import { CloudinaryStorage } from "multer-storage-cloudinary";
 import cloudinary from "../config/cloudinary.js";
+import { width } from "pdfkit/js/page";
 
-/* ===============================
-   FILE FILTER
-================================ */
 
 /* ===============================
    SMART FILE VALIDATION
 ================================ */
 
 const fileFilter = (req, file, cb) => {
-  if (!file.mimetype.startsWith("image/")) {
-    return cb(new Error("Only image files are allowed"), false);
+  const allowedTypes = ["image/jpeg", "image/png", "image/webp"];
+
+  if (!allowedTypes.includes(file.mimetype)) {
+    return cb(new Error("Only JPG, PNG, WEBP allowed"), false);
   }
+
   cb(null, true);
 };
 
-// const fileFilter = (req, file, cb) => {
-//   const { fieldname, mimetype } = file;
-
-//   // 📌 Passport → image only
-//   if (fieldname === "passport") {
-//     if (!mimetype.startsWith("image/")) {
-//       return cb(new Error("Passport must be an image"), false);
-//     }
-//   }
-
-//   // 📌 Student ID → image only
-//   if (fieldname === "studentID") {
-//     if (!mimetype.startsWith("image/")) {
-//       return cb(new Error("Student ID must be an image"), false);
-//     }
-//   }
-
-//   // 📌 Admission Letter → PDF only
-//   if (fieldname === "admissionLetter") {
-//     if (mimetype !== "application/pdf") {
-//       return cb(new Error("Admission Letter must be PDF"), false);
-//     }
-//   }
-
-//   // 📌 LGA Certificate → PDF only
-//   if (fieldname === "lgaCertificate") {
-//     if (mimetype !== "application/pdf") {
-//       return cb(new Error("LGA Certificate must be PDF"), false);
-//     }
-//   }
-
-//   cb(null, true);
-// };
-
-// const fileFilter = (req, file, cb) => {
-//   console.log("UPLOAD FILE:", file.fieldname, file.mimetype);
-//   cb(null, true); // ✅ allow everything for now
-// };
-
-// const fileFilter = (req, file, cb) => {
-
-//   if (!file.mimetype.startsWith("image/") && 
-//   file.mimetype !== "application/pdf") {
-//     return cb(new Error("Only images and PDFs allowed"), false);
-//   }
-
-//   cb(null, true);
-// };
 
 /* ===============================
    CLOUDINARY STORAGE - LEADERS
@@ -111,9 +64,14 @@ export const bursaryStorage = new CloudinaryStorage({
   params: async (req, file) => {
     return {
       folder: "ibiono/bursary",
-      resource_type: "image", // ✅ force image only
-      allowed_formats: ["jpg", "jpeg", "png", "webp"],
-      public_id: `${Date.now()}-${file.originalname.split(".")[0]}`,
+      // resource_type: "image", // ✅ force image only
+      // allowed_formats: ["jpg", "jpeg", "png", "webp"],
+      transformation:[
+        {width: 1000, crop: "limit"}, 
+        {quality: "auto"},
+        {fetch_format: "auto"},
+      ]
+      // public_id: `${Date.now()}-${file.originalname.split(".")[0]}`,
     };
   },
 });
