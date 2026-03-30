@@ -1,7 +1,7 @@
 import multer from "multer";
 import { CloudinaryStorage } from "multer-storage-cloudinary";
 import cloudinary from "../config/cloudinary.js";
-import { width } from "pdfkit/js/page";
+// import { width } from "pdfkit/js/page";
 
 
 /* ===============================
@@ -64,14 +64,11 @@ export const bursaryStorage = new CloudinaryStorage({
   params: async (req, file) => {
     return {
       folder: "ibiono/bursary",
-      // resource_type: "image", // ✅ force image only
-      // allowed_formats: ["jpg", "jpeg", "png", "webp"],
       transformation:[
         {width: 1000, crop: "limit"}, 
         {quality: "auto"},
         {fetch_format: "auto"},
       ]
-      // public_id: `${Date.now()}-${file.originalname.split(".")[0]}`,
     };
   },
 });

@@ -12,7 +12,7 @@ import {
 } from "../services/identity.services.js";
 
 import crypto from "crypto";
-import PDFDocument from "pdfkit";
+// import PDFDocument from "pdfkit";
 import QRCode from "qrcode";
 // import path from "path";
 // import { sendEmail } from "../utils/sendEmails.js";
@@ -568,9 +568,9 @@ export const downloadLetter = async (req, res) => {
 
   const app = await Bursary.findById(req.params.id);
 
-  const doc = new PDFDocument();
+  // const doc = new PDFDocument();
 
-  res.setHeader("Content-Type", "application/pdf");
+  res.setHeader("Content-Type", "application");
 
   doc.pipe(res);
 
