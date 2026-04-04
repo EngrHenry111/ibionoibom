@@ -1,6 +1,6 @@
 import express from "express";
 import cors from "cors";
-// import path from "path";
+import path from "path";
 import rateLimit from "express-rate-limit";
 import helmet from "helmet";
 import authRoutes from "./routes/auth.routes.js";
@@ -98,7 +98,17 @@ app.use("/api/diaspora", diasporaRoutes);
 
 app.use("/api/bmt", bmtRoutes);
 
-app.use("/", sitemapRoutes);
+// ================= SITEMAP =================
+app.use("/", sitemapRoutes); // ✅ MUST COME BEFORE REACT
+
+// ================= REACT BUILD =================
+app.use(express.static("client/dist"));
+
+// ================= CATCH ALL =================
+app.get("*", (req, res) => {
+  res.sendFile(path.resolve("client/dist/index.html"));
+});
+
 
 process.on("uncaughtException", (err) => {
   console.error("UNCAUGHT ERROR:", err);

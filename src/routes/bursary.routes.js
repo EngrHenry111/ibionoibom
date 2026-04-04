@@ -30,17 +30,6 @@ router.post(
   applyBursary
 );
 
-// router.post(
-//   "/apply",
-//   protectStudent,
-//   uploadBursaryDocuments.fields([
-//     { name: "passport", maxCount: 1 },
-//     { name: "admissionLetter", maxCount: 1 },
-//     { name: "studentID", maxCount: 1 },
-//     { name: "lgaCertificate", maxCount: 1 },
-//   ]),
-//   applyBursary
-// );
 
 /* ================= STUDENT ================= */
 router.get("/my", protectStudent, getMyApplications);
