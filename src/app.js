@@ -1,7 +1,6 @@
 import express from "express";
 import cors from "cors";
 import path from "path";
-import News from "./models/News.js"; // adjust path if needed
 import rateLimit from "express-rate-limit";
 import helmet from "helmet";
 import authRoutes from "./routes/auth.routes.js";
@@ -107,17 +106,23 @@ app.use("/", sitemapRoutes); // ✅ MUST COME BEFORE REACT
 
 // ================= OG META FOR FACEBOOK =================
 
+
+// 🔥🔥🔥 ADD THIS HERE (VERY IMPORTANT)
+import News from "./models/News.js";
+
 app.get("/news/:id", async (req, res) => {
+  console.log("🔥 OG ROUTE HIT");
+
   try {
     const news = await News.findById(req.params.id);
 
     if (!news) {
-      return res.status(404).send("News not found");
+      return res.status(404).send("Not found");
     }
 
     const image = news.images?.[0]
       ? `https://ibionoibom-2.onrender.com/uploads/news/${news.images[0]}`
-      : "https://ibionoibomlga.com/default.jpg";
+      : "https://ibionoibomlga.com/logo.png";
 
     res.status(200).send(`
       <!DOCTYPE html>
@@ -126,27 +131,24 @@ app.get("/news/:id", async (req, res) => {
           <title>${news.title}</title>
 
           <meta property="og:title" content="${news.title}" />
-          <meta property="og:description" content="${news.content.slice(0, 150)}" />
+          <meta property="og:description" content="${news.content.slice(0,150)}" />
           <meta property="og:image" content="${image}" />
           <meta property="og:url" content="https://ibionoibomlga.com/news/${news._id}" />
           <meta property="og:type" content="article" />
-
-          <meta name="twitter:card" content="summary_large_image" />
 
           <script>
             window.location.href = "/news/${news._id}";
           </script>
         </head>
-        <body>
-          Redirecting...
-        </body>
+        <body>Redirecting...</body>
       </html>
     `);
   } catch (err) {
-    console.error("OG ERROR:", err);
-    res.status(500).send("Server error");
+    console.error(err);
+    res.status(500).send("Error");
   }
 });
+
 
 // ================= REACT BUILD =================
 app.use(express.static("client/dist"));
