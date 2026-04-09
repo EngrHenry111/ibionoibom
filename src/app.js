@@ -147,7 +147,56 @@ app.use("/news/:id", async (req, res, next) => {
     return next();
   }
 });
+app.get("/news/:id", async (req, res, next) => {
+  if (!isBot(req)) return next(); // 👈 IMPORTANT
 
+  console.log("🔥 BOT DETECTED - SERVING OG");
+
+  try {
+    const news = await News.findById(req.params.id);
+
+    if (!news) return res.status(404).send("Not found");
+
+    const image = news.images?.[0]
+      ? `https://ibionoibom-2.onrender.com/uploads/news/${news.images[0]}`
+      : "https://ibionoibomlga.com/logo.png";
+
+    return res.status(200).send(`
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <title>${news.title}</title>
+
+          <meta property="og:title" content="${news.title}" />
+          <meta property="og:description" content="${news.content.slice(0,150)}" />
+          <meta property="og:image" content="${image}" />
+          <meta property="og:url" content="https://ibionoibomlga.com/news/${news._id}" />
+          <meta property="og:type" content="article" />
+
+        </head>
+        <body>
+          Shared content preview
+        </body>
+      </html>
+    `);
+
+  } catch (err) {
+    console.error(err);
+    return res.status(500).send("Error");
+  }
+});
+
+const isBot = (req) => {
+  const ua = req.headers["user-agent"] || "";
+
+  return (
+    ua.includes("facebookexternalhit") ||
+    ua.includes("Facebot") ||
+    ua.includes("Twitterbot") ||
+    ua.includes("WhatsApp") ||
+    ua.includes("LinkedInBot")
+  );
+};
 
 // ================= REACT BUILD =================
 app.use(express.static("client/dist"));
