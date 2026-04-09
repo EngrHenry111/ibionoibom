@@ -36,6 +36,7 @@ import bmtRoutes from "./routes/bmt.routes.js"
 
 import sitemapRoutes from "./routes/sitemap.routes.js"
 
+console.log("🔥 NEW SERVER CODE RUNNING");
 const app = express();
 app.use(cors());
 app.use(express.json());
