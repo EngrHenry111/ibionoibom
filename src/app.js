@@ -95,13 +95,13 @@ app.get("/news/:id", async (req, res, next) => {
   try {
     const news = await News.findById(req.params.id);
 
-    if (!news) return next();
+    if (!news) return res.status(404).send("Not found");
 
     const image = news.images?.[0]
       ? `https://ibionoibom-2.onrender.com/uploads/news/${news.images[0]}`
       : "https://ibionoibomlga.com/logo.png";
 
-    // ✅ If BOT → send OG HTML
+    // ✅ IF BOT → SEND OG META
     if (isBot(req)) {
       console.log("🔥 BOT DETECTED - OG SERVED");
 
@@ -124,12 +124,14 @@ app.get("/news/:id", async (req, res, next) => {
       `);
     }
 
-    // ✅ Normal users → continue to React
-    return next();
+    // ✅ NORMAL USERS → REDIRECT TO FRONTEND
+    return res.redirect(
+      `https://ibionoibomlga.com/news/${news._id}`
+    );
 
   } catch (err) {
     console.error("OG ERROR:", err);
-    return next();
+    return res.status(500).send("Server error");
   }
 });
 
