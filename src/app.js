@@ -110,7 +110,7 @@ app.use("/", sitemapRoutes); // ✅ MUST COME BEFORE REACT
 // 🔥🔥🔥 ADD THIS HERE (VERY IMPORTANT)
 import News from "./models/News.js";
 
-app.get("/news/:id", async (req, res) => {
+app.use("/news/:id", async (req, res, next) => {
   console.log("🔥 OG ROUTE HIT");
 
   try {
