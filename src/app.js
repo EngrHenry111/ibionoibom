@@ -134,14 +134,14 @@ app.get("/news/:id", async (req, res, next) => {
 });
 
 // ================= REACT BUILD =================
-const __dirname = new URL('.', import.meta.url).pathname;
+// const __dirname = new URL('.', import.meta.url).pathname;
 
-app.use(express.static(path.join(__dirname, "../client/dist")));
+// app.use(express.static(path.join(__dirname, "../client/dist")));
 
 // ================= CATCH ALL =================
-app.use((req, res) => {
-  res.sendFile(path.join(__dirname, "../client/dist/index.html"));
-});
+// app.use((req, res) => {
+//   res.sendFile(path.join(__dirname, "../client/dist/index.html"));
+// });
 
 // ================= ERROR HANDLING =================
 process.on("uncaughtException", (err) => {
