@@ -116,15 +116,13 @@ app.use("/news/:id", async (req, res, next) => {
   try {
     const news = await News.findById(req.params.id);
 
-    if (!news) {
-      return res.status(404).send("Not found");
-    }
+    if (!news) return next(); // fallback to React
 
     const image = news.images?.[0]
       ? `https://ibionoibom-2.onrender.com/uploads/news/${news.images[0]}`
       : "https://ibionoibomlga.com/logo.png";
 
-    res.status(200).send(`
+    return res.status(200).send(`
       <!DOCTYPE html>
       <html>
         <head>
@@ -143,9 +141,10 @@ app.use("/news/:id", async (req, res, next) => {
         <body>Redirecting...</body>
       </html>
     `);
+
   } catch (err) {
     console.error(err);
-    res.status(500).send("Error");
+    return next();
   }
 });
 
