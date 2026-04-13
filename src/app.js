@@ -1,8 +1,10 @@
 import express from "express";
 import cors from "cors";
-import path from "path";
 import rateLimit from "express-rate-limit";
 import helmet from "helmet";
+
+import { fileURLToPath } from "url";
+import path from "path";
 
 import authRoutes from "./routes/auth.routes.js";
 import leaderRoutes from "./routes/leader.routes.js";
@@ -77,19 +79,24 @@ app.use("/api/sitemap", sitemapRoutes);
 
 app.use("/", ogRoutes);
 
-
 // // ================= REACT BUILD =================
-// app.use(express.static("client/dist"));
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
-// // ================= CATCH ALL =================
-// app.get("*", (req, res) =>{
-//   res.sendFile(path.resolve("client/dist/index.html"));
-// })
+
+// ================= REACT BUILD =================
+app.use(express.static("client/dist"));
+
+// ================= CATCH ALL =================
+app.get("/{*any}", (req, res) => {
+  res.sendFile(path.join(__dirname, "client/dist/index.html"));
+});
 
 // ================= ERROR HANDLING =================
 process.on("uncaughtException", (err) => {
   console.error("UNCAUGHT ERROR:", err);
 });
+
 
 process.on("unhandledRejection", (err) => {
   console.error("UNHANDLED PROMISE:", err);
