@@ -17,32 +17,29 @@ router.get("/og/news/:id", async (req, res) => {
 
     const image = getImageUrl(news.images?.[0]);
 
-    res.send(`
-    <!DOCTYPE html>
-    <html>
-      <head>
-        <title>${news.title}</title>
+   res.send(`
+<!DOCTYPE html>
+<html>
+<head>
+  <title>${news.title}</title>
 
-        <meta property="og:title" content="${news.title}" />
-        <meta property="og:description" content="${news.content.slice(0,150)}" />
-        <meta property="og:image" content="${image}" />
-        <meta property="og:url" content="https://ibionoibomlga.com/news/${news._id}" />
-        <meta property="og:type" content="article" />
-        <meta property="og:site_name" content="Ibiono Ibom LGA" />
+  <meta property="og:title" content="${news.title}" />
+  <meta property="og:description" content="${news.content.slice(0,150)}" />
+  <meta property="og:image" content="${image}" />
+  <meta property="og:url" content="https://ibionoibomlga.com/news/${news._id}" />
+  <meta property="og:image:secure_url" content="${image}" />
+  <meta property="og:type" content="article" />
+  <meta property="og:site_name" content="Ibiono Ibom LGA" />
 
-        <meta name="twitter:card" content="summary_large_image" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
 
-        <!-- ✅ MOBILE SAFE REDIRECT -->
-                    
-            <script>
-            setTimeout(() => {
-                window.location.href = "https://ibionoibomlga.com/news/${news._id}";
-            }, 3000);
-            </script>  
-        </head>
-      <body></body>
-    </html>
-    `);
+</head>
+<body>
+  <p>Redirecting...</p>
+</body>
+</html>
+`);
 
   } catch (err) {
     console.error("OG ERROR:", err);
