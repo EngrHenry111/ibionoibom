@@ -26,10 +26,7 @@ import diasporaRoutes from "./routes/diaspora.routes.js";
 import bmtRoutes from "./routes/bmt.routes.js";
 import sitemapRoutes from "./routes/sitemap.routes.js";
 
-// ✅ IMPORT MODEL AT TOP (IMPORTANT)
-import News from "./models/News.js";
-
-console.log("🔥 NEW SERVER CODE RUNNING");
+import ogRoutes from "./routes/og.routes.js"
 
 const app = express();
 
@@ -78,72 +75,19 @@ app.use("/api/bmt", bmtRoutes);
 // ================= SITEMAP =================
 app.use("/api/sitemap", sitemapRoutes);
 
-// ================= BOT DETECTION =================
-const isBot = (req) => {
-  const ua = req.headers["user-agent"] || "";
-  return (
-    ua.includes("facebookexternalhit") ||
-    ua.includes("Facebot") ||
-    ua.includes("Twitterbot") ||
-    ua.includes("WhatsApp") ||
-    ua.includes("LinkedInBot")
-  );
-};
+app.use("/", ogRoutes);
 
-// ================= OG META ROUTE (FIXED) =================
-app.get("/news/:id", async (req, res, next) => {
-  try {
-    const news = await News.findById(req.params.id);
-
-    if (!news) return res.status(404).send("Not found");
-
-    const image = news.images?.[0]
-      ? `https://ibionoibom-2.onrender.com/uploads/news/${news.images[0]}`
-      : "https://ibionoibomlga.com/logo.png";
-
-    // ✅ IF BOT → SEND OG META
-    if (isBot(req)) {
-      console.log("🔥 BOT DETECTED - OG SERVED");
-
-      return res.status(200).send(`
-        <!DOCTYPE html>
-        <html>
-          <head>
-            <title>${news.title}</title>
-
-            <meta property="og:title" content="${news.title}" />
-            <meta property="og:description" content="${news.content.slice(0,150)}" />
-            <meta property="og:image" content="${image}" />
-            <meta property="og:url" content="https://ibionoibomlga.com/news/${news._id}" />
-            <meta property="og:type" content="article" />
-
-            <meta name="twitter:card" content="summary_large_image" />
-          </head>
-          <body>Preview</body>
-        </html>
-      `);
-    }
-
-    // ✅ NORMAL USERS → REDIRECT TO FRONTEND
-    return res.redirect(
-      `https://ibionoibomlga.com/news/${news._id}`
-    );
-
-  } catch (err) {
-    console.error("OG ERROR:", err);
-    return res.status(500).send("Server error");
-  }
-});
 
 // ================= REACT BUILD =================
-// const __dirname = new URL('.', import.meta.url).pathname;
+const __dirname = new URL('.', import.meta.url).pathname;
 
-// app.use(express.static(path.join(__dirname, "../client/dist")));
+app.use(express.static(path.join(__dirname, "../client/dist")));
 
 // ================= CATCH ALL =================
-// app.use((req, res) => {
-//   res.sendFile(path.join(__dirname, "../client/dist/index.html"));
-// });
+app.use((req, res) => {
+  res.sendFile(path.join(__dirname, "../client/dist/index.html"));
+});
+
 
 // ================= ERROR HANDLING =================
 process.on("uncaughtException", (err) => {
