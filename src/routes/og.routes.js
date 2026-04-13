@@ -15,7 +15,18 @@ router.get("/og/news/:id", async (req, res) => {
       return `https://ibionoibom-2.onrender.com/uploads/news/${img}`;
     };
 
-    const image = getImageUrl(news.images?.[0]);
+    // const image = getImageUrl(news.images?.[0]);
+
+    let image = getImageUrl(news.images?.[0]);
+
+// 🔥 FORCE CLOUDINARY RESIZE
+if (image.includes("/upload/")) {
+  image = image.replace(
+    "/upload/",
+    "/upload/w_1200,h_630,c_fill,g_auto/"
+  );
+}
+
 
    res.send(`
 <!DOCTYPE html>
