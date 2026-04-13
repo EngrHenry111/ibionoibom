@@ -33,11 +33,34 @@ const leaderStorage = new CloudinaryStorage({
 /* ===============================
    CLOUDINARY STORAGE - NEWS
 ================================ */
+// const newsStorage = new CloudinaryStorage({
+//   cloudinary,
+//   params: {
+//     folder: "ibiono/news",
+//     allowed_formats: ["jpg", "jpeg", "png", "webp"],
+//   },
+// });
+
 const newsStorage = new CloudinaryStorage({
   cloudinary,
-  params: {
-    folder: "ibiono/news",
-    allowed_formats: ["jpg", "jpeg", "png", "webp"],
+  params: async (req, file) => {
+    return {
+      folder: "ibiono/news",
+      allowed_formats: ["jpg", "jpeg", "png", "webp"],
+
+      transformation: [
+        {
+          width: 1200,
+          height: 630,
+          crop: "fill",   // ensures exact size
+          gravity: "auto" // smart cropping
+        },
+        {
+          quality: "auto",
+          fetch_format: "auto"
+        }
+      ]
+    };
   },
 });
 
