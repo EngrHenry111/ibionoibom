@@ -76,7 +76,7 @@ app.use("/api/diaspora", diasporaRoutes);
 app.use("/api/bmt", bmtRoutes);
 
 // ================= SITEMAP =================
-app.use("/", sitemapRoutes);
+app.use("/api/sitemap", sitemapRoutes);
 
 // ================= BOT DETECTION =================
 const isBot = (req) => {
