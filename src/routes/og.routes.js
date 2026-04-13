@@ -19,8 +19,8 @@ router.get("/og/news/:id", async (req, res) => {
 
     let image = getImageUrl(news.images?.[0]);
 
-// 🔥 FORCE CLOUDINARY RESIZE
-if (image.includes("/upload/")) {
+// 🔥 FORCE CLOUDINARY RESIZE (VERY STRICT CHECK)
+if (image && image.includes("res.cloudinary.com")) {
   image = image.replace(
     "/upload/",
     "/upload/w_1200,h_630,c_fill,g_auto/"
