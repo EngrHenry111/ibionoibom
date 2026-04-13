@@ -78,13 +78,13 @@ app.use("/api/sitemap", sitemapRoutes);
 app.use("/", ogRoutes);
 
 
-// ================= REACT BUILD =================
-app.use(express.static("client/dist"));
+// // ================= REACT BUILD =================
+// app.use(express.static("client/dist"));
 
-// ================= CATCH ALL =================
-app.get("*", (req, res) =>{
-  res.sendFile(path.resolve("client/dist/index.html"));
-});
+// // ================= CATCH ALL =================
+// app.get("*", (req, res) =>{
+//   res.sendFile(path.resolve("client/dist/index.html"));
+// })
 
 // ================= ERROR HANDLING =================
 process.on("uncaughtException", (err) => {
