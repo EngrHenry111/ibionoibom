@@ -33,7 +33,11 @@ router.get("/og/news/:id", async (req, res) => {
         <meta name="twitter:card" content="summary_large_image" />
 
         <!-- ✅ MOBILE SAFE REDIRECT -->
-        <meta http-equiv="refresh" content="0; url=https://ibionoibomlga.com/news/${news._id}" />
+        <script>
+        setTimeout(() => {
+            window.location.href = "https://ibionoibomlga.com/news/${news._id}";
+        }, 3000);
+        </script>
       </head>
       <body></body>
     </html>
