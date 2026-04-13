@@ -79,15 +79,12 @@ app.use("/", ogRoutes);
 
 
 // ================= REACT BUILD =================
-const __dirname = new URL('.', import.meta.url).pathname;
-
-app.use(express.static(path.join(__dirname, "../client/dist")));
+app.use(express.static("client/dist"));
 
 // ================= CATCH ALL =================
-app.use((req, res) => {
-  res.sendFile(path.join(__dirname, "../client/dist/index.html"));
+app.get("*", (req, res) =>{
+  res.sendFile(path.resolve("client/dist/index.html"));
 });
-
 
 // ================= ERROR HANDLING =================
 process.on("uncaughtException", (err) => {
