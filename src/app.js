@@ -3,9 +3,6 @@ import cors from "cors";
 import rateLimit from "express-rate-limit";
 import helmet from "helmet";
 
-import { fileURLToPath } from "url";
-import path from "path";
-
 import authRoutes from "./routes/auth.routes.js";
 import leaderRoutes from "./routes/leader.routes.js";
 import departmentRoutes from "./routes/department.routes.js";
@@ -29,6 +26,8 @@ import bmtRoutes from "./routes/bmt.routes.js";
 import sitemapRoutes from "./routes/sitemap.routes.js";
 
 import ogRoutes from "./routes/og.routes.js"
+
+
 
 const app = express();
 
@@ -79,18 +78,6 @@ app.use("/api/sitemap", sitemapRoutes);
 
 app.use("/", ogRoutes);
 
-// // ================= REACT BUILD =================
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-
-// ================= REACT BUILD =================
-app.use(express.static("client/dist"));
-
-// ================= CATCH ALL =================
-app.get("/{*any}", (req, res) => {
-  res.sendFile(path.join(__dirname, "client/dist/index.html"));
-});
 
 // ================= ERROR HANDLING =================
 process.on("uncaughtException", (err) => {
