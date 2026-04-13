@@ -27,7 +27,6 @@ router.get("/og/news/:id", async (req, res) => {
   <meta property="og:description" content="${news.content.slice(0,150)}" />
   <meta property="og:image" content="${image}" />
   <meta property="og:url" content="https://ibionoibomlga.com/news/${news._id}" />
-  <meta property="og:image:secure_url" content="${image}" />
   <meta property="og:type" content="article" />
   <meta property="og:site_name" content="Ibiono Ibom LGA" />
 
@@ -36,7 +35,12 @@ router.get("/og/news/:id", async (req, res) => {
 
 </head>
 <body>
-  <p>Redirecting...</p>
+  <h3>${news.title}</h3>
+  <p>${news.content.slice(0,100)}...</p>
+
+  <a href="https://ibionoibomlga.com/news/${news._id}">
+    👉 Click here to read full news
+  </a>
 </body>
 </html>
 `);
