@@ -46,6 +46,10 @@ if (image && image.includes("res.cloudinary.com")) {
 
 </head>
 <body>
+
+<script>
+  window.location.href = "https://ibionoibomlga.com/news/${news._id}";
+</script>
   <h3>${news.title}</h3>
   <p>${news.content.slice(0,100)}...</p>
 
