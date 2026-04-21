@@ -44,16 +44,12 @@ if (image && image.includes("res.cloudinary.com")) {
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="630" />
 
-  <!-- ✅ ADD THIS (VERY IMPORTANT) -->
-  <meta http-equiv="refresh" content="0; url=https://ibionoibomlga.com/news/${news._id}" />
-
+  
 
 </head>
 <body>
 
-<script>
-  window.location.href = "https://ibionoibomlga.com/news/${news._id}";
-</script>
+
   <h3>${news.title}</h3>
   <p>${news.content.slice(0,100)}...</p>
 
